@@ -359,8 +359,7 @@ export class Serializer {
               parentObject.attributes = parentObject.attributes || {};
               parentObject.attributes[propName] = serializedValue;
             } else if (propertyMapper.xmlIsWrapped) {
-              parentObject[propName] = {};
-              parentObject[propName][propertyMapper.xmlElementName!] = serializedValue;
+              parentObject[propName] = { [propertyMapper.xmlElementName!]: serializedValue };
             } else {
               parentObject[propName] = serializedValue;
             }
