@@ -6,8 +6,10 @@ var utils = require("./util/utils");
 var moment_1 = require("moment");
 var isBuffer = require("is-buffer");
 var isStream = require("is-stream");
+var util_1 = require("util");
 var Serializer = /** @class */ (function () {
-    function Serializer(mappers) {
+    function Serializer(mappers, isXML) {
+        this.isXML = isXML;
         this.modelMappers = mappers;
     }
     Serializer.prototype.validateConstraints = function (mapper, value, objectName) {
@@ -310,45 +312,66 @@ var Serializer = /** @class */ (function () {
                         ("mapper \"" + JSON.stringify(modelMapper) + "\" of type \"" + mapper.type.className + "\" for object \"" + objectName + "\"."));
                 }
             }
-            for (var key in modelProps) {
-                if (modelProps.hasOwnProperty(key)) {
-                    var paths = this.splitSerializeName(modelProps[key].serializedName);
-                    var propName = paths.pop();
-                    var parentObject = payload;
-                    for (var _i = 0, paths_1 = paths; _i < paths_1.length; _i++) {
-                        var pathName = paths_1[_i];
+            for (var _i = 0, _a = Object.keys(modelProps); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var propertyMapper = modelProps[key];
+                var propName = void 0;
+                var parentObject = payload;
+                if (this.isXML) {
+                    if (propertyMapper.xmlIsWrapped) {
+                        propName = propertyMapper.xmlName;
+                    }
+                    else {
+                        propName = propertyMapper.xmlElementName || propertyMapper.xmlName;
+                    }
+                }
+                else {
+                    var paths = this.splitSerializeName(propertyMapper.serializedName);
+                    propName = paths.pop();
+                    for (var _b = 0, paths_1 = paths; _b < paths_1.length; _b++) {
+                        var pathName = paths_1[_b];
                         var childObject = parentObject[pathName];
                         if ((childObject === null || childObject === undefined) && (object[key] !== null && object[key] !== undefined)) {
                             parentObject[pathName] = {};
                         }
                         parentObject = parentObject[pathName];
                     }
-                    // make sure required properties of the CompositeType are present
-                    if (modelProps[key].required && !modelProps[key].isConstant) {
-                        if (object[key] === null || object[key] === undefined) {
-                            throw new Error(key + "\" cannot be null or undefined in \"" + objectName + "\".");
+                }
+                // make sure required properties of the CompositeType are present
+                if (modelProps[key].required && !modelProps[key].isConstant) {
+                    if (object[key] === null || object[key] === undefined) {
+                        throw new Error(key + "\" cannot be null or undefined in \"" + objectName + "\".");
+                    }
+                }
+                // make sure that readOnly properties are not sent on the wire
+                if (modelProps[key].readOnly) {
+                    continue;
+                }
+                // serialize the property if it is present in the provided object instance
+                if (((parentObject !== null && parentObject !== undefined) && (modelProps[key].defaultValue !== null && modelProps[key].defaultValue !== undefined)) ||
+                    (object[key] !== null && object[key] !== undefined)) {
+                    var propertyObjectName = modelProps[key].serializedName !== ""
+                        ? objectName + "." + modelProps[key].serializedName
+                        : objectName;
+                    var serializedValue = this.serialize(propertyMapper, object[key], propertyObjectName);
+                    if (propName !== null && propName !== undefined) {
+                        if (propertyMapper.xmlIsAttribute) {
+                            parentObject.attributes = parentObject.attributes || {};
+                            parentObject.attributes[propName] = serializedValue;
                         }
-                    }
-                    // make sure that readOnly properties are not sent on the wire
-                    if (modelProps[key].readOnly) {
-                        continue;
-                    }
-                    // serialize the property if it is present in the provided object instance
-                    if (((parentObject !== null && parentObject !== undefined) && (modelProps[key].defaultValue !== null && modelProps[key].defaultValue !== undefined)) ||
-                        (object[key] !== null && object[key] !== undefined)) {
-                        var propertyObjectName = objectName;
-                        if (modelProps[key].serializedName !== "")
-                            propertyObjectName = objectName + "." + modelProps[key].serializedName;
-                        var propertyMapper = modelProps[key];
-                        var serializedValue = this.serialize(propertyMapper, object[key], propertyObjectName);
-                        if (propName !== null && propName !== undefined)
+                        else if (propertyMapper.xmlIsWrapped) {
+                            parentObject[propName] = (_c = {}, _c[propertyMapper.xmlElementName] = serializedValue, _c);
+                        }
+                        else {
                             parentObject[propName] = serializedValue;
+                        }
                     }
                 }
             }
             return payload;
         }
         return object;
+        var _c;
     };
     /**
      * Serialize the given object based on its metadata defined in the mapper
@@ -425,7 +448,8 @@ var Serializer = /** @class */ (function () {
                 name: "Composite"
             }
         };
-        if (responseBody !== null && responseBody !== undefined) {
+        responseBody = responseBody || {};
+        if (responseBody) {
             var modelProps = mapper.type.modelProperties;
             if (!modelProps) {
                 if (!mapper.type.className) {
@@ -443,24 +467,44 @@ var Serializer = /** @class */ (function () {
                         ("mapper \"" + JSON.stringify(modelMapper) + "\" of type \"" + mapper.type.className + "\" for responseBody \"" + objectName + "\"."));
                 }
             }
-            for (var key in modelProps) {
-                if (modelProps.hasOwnProperty(key)) {
+            for (var _i = 0, _a = Object.keys(modelProps); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var propertyMapper = modelProps[key];
+                var propertyObjectName = objectName;
+                if (propertyMapper.serializedName !== "") {
+                    propertyObjectName = objectName + "." + modelProps[key].serializedName;
+                }
+                if (this.isXML) {
+                    if (propertyMapper.xmlIsAttribute && responseBody.attributes) {
+                        instance[key] = this.deserialize(propertyMapper, responseBody.attributes[propertyMapper.xmlName], propertyObjectName);
+                    }
+                    else {
+                        var propertyName = propertyMapper.xmlElementName || propertyMapper.xmlName;
+                        var unwrappedProperty = responseBody[propertyName];
+                        if (propertyMapper.xmlIsWrapped) {
+                            unwrappedProperty = responseBody[propertyMapper.xmlName];
+                            unwrappedProperty = unwrappedProperty && unwrappedProperty[propertyMapper.xmlElementName];
+                            if (unwrappedProperty === undefined) {
+                                // undefined means a wrapped list was empty
+                                unwrappedProperty = [];
+                            }
+                        }
+                        instance[key] = this.deserialize(propertyMapper, unwrappedProperty, propertyObjectName);
+                    }
+                }
+                else {
                     var paths = this.splitSerializeName(modelProps[key].serializedName);
                     // deserialize the property if it is present in the provided responseBody instance
                     var propertyInstance = void 0;
                     var res = responseBody;
                     // traversing the object step by step.
-                    for (var _i = 0, paths_2 = paths; _i < paths_2.length; _i++) {
-                        var item = paths_2[_i];
+                    for (var _b = 0, paths_2 = paths; _b < paths_2.length; _b++) {
+                        var item = paths_2[_b];
                         if (!res)
                             break;
                         res = res[item];
                     }
                     propertyInstance = res;
-                    var propertyObjectName = objectName;
-                    if (modelProps[key].serializedName !== "")
-                        propertyObjectName = objectName + "." + modelProps[key].serializedName;
-                    var propertyMapper = modelProps[key];
                     var serializedValue = void 0;
                     // paging
                     if (Array.isArray(responseBody[key]) && modelProps[key].serializedName === "") {
@@ -501,6 +545,10 @@ var Serializer = /** @class */ (function () {
                 ("mapper and it must of type \"object\" in " + objectName));
         }
         if (responseBody) {
+            if (!util_1.isArray(responseBody)) {
+                // xml2js will interpret a single element array as just the element, so force it to be an array
+                responseBody = [responseBody];
+            }
             var tempArray = [];
             for (var i = 0; i < responseBody.length; i++) {
                 tempArray[i] = this.deserialize(mapper.type.element, responseBody[i], objectName);
@@ -521,15 +569,51 @@ var Serializer = /** @class */ (function () {
      * @returns {object|string|Array|number|boolean|Date|stream} A valid deserialized Javascript object
      */
     Serializer.prototype.deserialize = function (mapper, responseBody, objectName) {
-        if (responseBody === null || responseBody === undefined)
+        if (responseBody == undefined) {
+            if (this.isXML && mapper.type.name === "Sequence" && !mapper.xmlIsWrapped) {
+                // Edge case for empty XML non-wrapped lists. xml2js can't distinguish
+                // between the list being empty versus being missing,
+                // so let's do the more user-friendly thing and return an empty list.
+                responseBody = [];
+            }
+            else {
+                return responseBody;
+            }
             return responseBody;
+        }
         var payload;
         var mapperType = mapper.type.name;
-        if (!objectName)
+        if (!objectName) {
             objectName = mapper.serializedName;
-        if (mapperType.match(/^Sequence$/ig) !== null)
-            payload = [];
-        if (mapperType.match(/^(Number|String|Boolean|Enum|Object|Stream|Uuid|any)$/ig) !== null) {
+        }
+        if (mapperType.match(/^Number$/ig) !== null) {
+            if (this.isXML) {
+                payload = parseFloat(responseBody);
+                if (isNaN(payload)) {
+                    payload = responseBody;
+                }
+            }
+            else {
+                payload = responseBody;
+            }
+        }
+        else if (mapperType.match(/^Boolean$/ig) !== null) {
+            if (this.isXML) {
+                if (responseBody === "true") {
+                    payload = true;
+                }
+                else if (responseBody === "false") {
+                    payload = false;
+                }
+                else {
+                    payload = responseBody;
+                }
+            }
+            else {
+                payload = responseBody;
+            }
+        }
+        else if (mapperType.match(/^(String|Enum|Object|Stream|Uuid|any)$/ig) !== null) {
             payload = responseBody;
         }
         else if (mapperType.match(/^(Date|DateTime|DateTimeRfc1123)$/ig) !== null) {
@@ -556,8 +640,9 @@ var Serializer = /** @class */ (function () {
         else if (mapperType.match(/^Composite$/ig) !== null) {
             payload = this.deserializeCompositeType(mapper, responseBody, objectName);
         }
-        if (mapper.isConstant)
+        if (mapper.isConstant) {
             payload = mapper.defaultValue;
+        }
         return payload;
     };
     Serializer.prototype.getPolymorphicMapper = function (mapper, object, objectName, mode) {

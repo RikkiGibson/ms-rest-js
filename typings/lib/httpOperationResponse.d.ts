@@ -18,11 +18,11 @@ export declare class HttpOperationResponse {
     /**
      * The response body as text (string format)
      */
-    bodyAsText: string | null;
+    bodyAsText?: string | null;
     /**
-     * The response body as parsed JSON
+     * The response body as parsed JSON or XML
      */
-    bodyAsJson: {
+    bodyAsJson?: {
         [key: string]: any;
     } | Array<any> | string | number | boolean | null | void;
     constructor(request: WebResource, response: Response);
