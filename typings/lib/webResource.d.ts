@@ -16,6 +16,7 @@ export declare class WebResource {
         [key: string]: any;
     };
     rawResponse?: boolean;
+    form?: any;
     formData?: any;
     query?: {
         [key: string]: any;
@@ -66,6 +67,9 @@ export declare class WebResource {
  * Example:
  *    - path-parameter-value in "object" format: { "path-parameter-name": { value: "path-parameter-value", skipUrlEncoding: true } }
  *    - path-parameter-value in "string" format: { "path-parameter-name": "path-parameter-value" }.
+ * @param {object} [options.formData] A dictionary of key-value pairs for the formData object.
+ * If the expected 'Content-Type' to be set is 'application/x-www-form-urlencoded' then please set it in the options.headers object else the
+ * 'Content-Type' header will be set to 'multipart/form-data'.
  * @param {object} [options.headers] A dictionary of request headers that need to be applied to the request.
  * Here the key is the "header-name" and the value is the "header-value". The header-value MUST be of type string.
  *  - ContentType must be provided with the key name as "Content-Type". Default value "application/json; charset=utf-8".
@@ -86,13 +90,16 @@ export interface RequestPrepareOptions {
     method: HttpMethods;
     url?: string;
     queryParameters?: {
-        [key: string]: any;
-    } | ParameterValue;
+        [key: string]: string | ParameterValue;
+    };
     pathTemplate?: string;
     baseUrl?: string;
     pathParameters?: {
+        [key: string]: string | ParameterValue;
+    };
+    formData?: {
         [key: string]: any;
-    } | ParameterValue;
+    };
     headers?: {
         [key: string]: any;
     };
@@ -110,9 +117,8 @@ export interface RequestPrepareOptions {
  * The Parameter value provided for path or query parameters in RequestPrepareOptions
  */
 export interface ParameterValue {
-    value: any;
+    value: string;
     skipUrlEncoding: boolean;
-    [key: string]: any;
 }
 /**
  * Describes the base structure of the options object that will be used in every operation.

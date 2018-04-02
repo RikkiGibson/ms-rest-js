@@ -154,6 +154,17 @@ var WebResource = /** @class */ (function () {
             // append the queryString
             this.url += queryParams.join("&");
         }
+        // set formData parameters for 'application/x-www-form-urlencoded' or 'multipart/form-data'.
+        if (options.formData) {
+            if (options.headers && options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
+                this.form = options.formData;
+                this.headers["Content-Type"] = "application/x-www-form-urlencoded";
+            }
+            else {
+                this.formData = options.formData;
+                this.headers["Content-Type"] = "multipart/form-data";
+            }
+        }
         // add headers to the request if they are provided
         if (options.headers) {
             var headers = options.headers;
