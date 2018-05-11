@@ -18,13 +18,11 @@ export class WebResource {
   method: HttpMethods;
   body?: any;
   headers: { [key: string]: any; } = {};
-  rawResponse?: boolean;
   formData?: any;
   query?: { [key: string]: any; };
 
 
-  constructor(url?: string, method?: HttpMethods, body?: any, query?: { [key: string]: any; }, headers: { [key: string]: any; } = {}, rawResponse = false) {
-    this.rawResponse = rawResponse;
+  constructor(url?: string, method?: HttpMethods, body?: any, query?: { [key: string]: any; }, headers: { [key: string]: any; } = {}) {
     this.url = url || "";
     this.method = method || "GET";
     this.headers = headers || {};

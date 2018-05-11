@@ -7,6 +7,7 @@ import { HttpClient } from "./httpClient";
 import { HttpOperationResponse } from "./httpOperationResponse";
 import { WebResource } from "./webResource";
 import { RestError } from "./restError";
+import { isNode } from "./util/utils";
 
 /**
  * A HttpClient implementation that uses fetch to send HTTP requests.
@@ -55,52 +56,55 @@ export class FetchHttpClient implements HttpClient {
     // allow cross-origin cookies in browser
     (httpRequest as any).credentials = "include";
 
-    let res: Response;
-    try {
-      res = await myFetch(httpRequest.url, httpRequest);
-    } catch (err) {
-      return Promise.reject(err);
+    const res: Response = await myFetch(httpRequest.url, httpRequest);
+
+    const headers: { [headerName: string]: string } = {};
+    const entries = res.headers.entries();
+    // due to targeting es5 we have to use a slightly ugly method of iterating the entries
+    let entry: IteratorResult<[string, string]>;
+    while (!(entry = entries.next()).done) {
+      headers[entry.value[0]] = entry.value[1];
     }
 
-    const operationResponse = new HttpOperationResponse(httpRequest, res);
-    if (!httpRequest.rawResponse) {
+    const parsedBody = async () => {
+      const text = await res.text();
+      const contentType = res.headers.get("Content-Type")!;
       try {
-        operationResponse.bodyAsText = await res.text();
-      } catch (err) {
-        const msg = `Error "${err}" occured while converting the raw response body into string.`;
-        const errCode = err.code || "RAWTEXT_CONVERSION_ERROR";
-        const e = new RestError(msg, errCode, res.status, httpRequest, res, res.body);
-        return Promise.reject(e);
-      }
-
-      try {
-        if (operationResponse.bodyAsText) {
-          const contentType = res.headers.get("Content-Type")!;
-          if (contentType === "application/xml" || contentType === "text/xml") {
-            const xmlParser = new xml2js.Parser(XML2JS_PARSER_OPTS);
-            const parseString = new Promise(function (resolve: (result: any) => void, reject: (err: any) => void) {
-              xmlParser.parseString(operationResponse.bodyAsText!, function (err: any, result: any) {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(result);
-                }
-              });
+        if (contentType === "application/xml" || contentType === "text/xml") {
+          const xmlParser = new xml2js.Parser(XML2JS_PARSER_OPTS);
+          const parseString = new Promise(function (resolve: (result: any) => void, reject: (err: any) => void) {
+            xmlParser.parseString(operationResponse.bodyAsText!, function (err: any, result: any) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
             });
+          });
 
-            operationResponse.parsedBody = await parseString;
-          } else {
-            operationResponse.parsedBody = JSON.parse(operationResponse.bodyAsText);
-          }
+          // await so that any exceptions get thrown and caught here
+          return await parseString;
+        } else {
+          return JSON.parse(text);
         }
       } catch (err) {
-        const msg = `Error "${err}" occured while executing JSON.parse on the response body - ${operationResponse.bodyAsText}.`;
-        const errCode = err.code || "JSON_PARSE_ERROR";
-        const e = new RestError(msg, errCode, res.status, httpRequest, res, operationResponse.bodyAsText);
-        return Promise.reject(e);
+        const msg = `Error "${err}" occurred while when parsing the response body - ${operationResponse.bodyAsText}.`;
+        const errCode = err.code || "PARSE_ERROR";
+        throw new RestError(msg, errCode, res.status, httpRequest, res, operationResponse.bodyAsText);
       }
-    }
-    return Promise.resolve(operationResponse);
+    };
+
+    const operationResponse: HttpOperationResponse = {
+      request: httpRequest,
+      statusCode: res.status,
+      headers,
+      bodyAsText: () => res.text(),
+      bodyAsBlob: () => res.blob(),
+      readableStreamBody: isNode ? res.body as any : undefined,
+      parsedBody,
+    };
+
+    return operationResponse;
   }
 }
 

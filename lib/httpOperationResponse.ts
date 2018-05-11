@@ -10,41 +10,35 @@ import { WebResource } from "./webResource";
  * Initializes a new instance of the HttpOperationResponse class.
  * @constructor
  */
-export class HttpOperationResponse {
+export interface HttpOperationResponse {
   /**
    * The raw request
    */
   request: WebResource;
-  /**
-   * The raw response. Please use the response directly when the response body is a ReadableStream.
-   */
-  response: Response;
+
+  statusCode: number;
+
+  headers: { [headerName: string]: string };
+
   /**
    * The response body as text (string format)
    */
-  bodyAsText?: string | null;
+  bodyAsText(): Promise<string | null>;
+
+  /**
+   * The response body as a Blob. Only available in the browser.
+   * Always rejects when called in node.js.
+   */
+  bodyAsBlob(): Promise<Blob>;
+
+  /**
+   * The response body as a node.js ReadableStream.
+   * Always undefined in the browser.
+   */
+  readableStreamBody?: NodeJS.ReadableStream;
 
   /**
    * The response body as parsed JSON or XML
    */
-  parsedBody?: { [key: string]: any } | Array<any> | string | number | boolean | null | void;
-
-  constructor(request: WebResource, response: Response) {
-    /**
-     * Reference to the original request object.
-     * [WebResource] object.
-     * @type {object}
-     */
-    this.request = request;
-
-    /**
-     * Reference to the original response object.
-     * [ServerResponse] object.
-     * @type {object}
-     */
-    this.response = response;
-    /* tslint:disable:no-null-keyword */
-    this.bodyAsText = null;
-    this.parsedBody = null;
-  }
+  parsedBody(): Promise<any>;
 }

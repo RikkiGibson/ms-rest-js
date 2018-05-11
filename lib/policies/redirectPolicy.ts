@@ -20,30 +20,27 @@ export class RedirectPolicy extends BaseRequestPolicy {
     this.maximumRetries = maximumRetries;
   }
 
-  async handleRedirect(operationResponse: HttpOperationResponse, currentRetries: number): Promise<HttpOperationResponse> {
-    const request = operationResponse.request;
-    const response = operationResponse.response;
-    if (response && response.headers && response.headers.get("location") &&
-      (response.status === 300 || response.status === 307 || (response.status === 303 && request.method === "POST")) &&
+  async handleRedirect(response: HttpOperationResponse, currentRetries: number): Promise<HttpOperationResponse> {
+    const request = response.request;
+    if (response.headers["location"] &&
+      (response.statusCode === 300 || response.statusCode === 307 || (response.statusCode === 303 && request.method === "POST")) &&
       (!this.maximumRetries || currentRetries < this.maximumRetries)) {
 
-      request.url = parse(response.headers.get("location")!, parse(request.url)).href;
+      request.url = parse(response.headers["location"], parse(request.url)).href;
 
       // POST request with Status code 303 should be converted into a
       // redirected GET request if the redirect url is present in the location header
-      if (response.status === 303) {
+      if (response.statusCode === 303) {
         request.method = "GET";
       }
       let res: HttpOperationResponse;
-      try {
-        res = await this._nextPolicy.sendRequest(request);
-        currentRetries++;
-      } catch (err) {
-        return Promise.reject(err);
-      }
+
+      res = await this._nextPolicy.sendRequest(request);
+      currentRetries++;
+
       return this.handleRedirect(res, currentRetries);
     }
-    return Promise.resolve(operationResponse);
+    return Promise.resolve(response);
   }
 
   public async sendRequest(request: WebResource): Promise<HttpOperationResponse> {

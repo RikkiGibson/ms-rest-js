@@ -22,11 +22,11 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
     return this.registerIfNeeded(response);
   }
 
-  async registerIfNeeded(operationResponse: HttpOperationResponse): Promise<HttpOperationResponse> {
+  async registerIfNeeded(response: HttpOperationResponse): Promise<HttpOperationResponse> {
     let rpName, urlPrefix;
-    const options = operationResponse.request;
-    if (operationResponse.response.status === 409) {
-      rpName = this.checkRPNotRegisteredError(operationResponse.bodyAsText as string);
+    const options = response.request;
+    if (response.statusCode === 409) {
+      rpName = this.checkRPNotRegisteredError(await response.bodyAsText());
     }
     if (rpName) {
       urlPrefix = this.extractSubscriptionUrl(options.url);
@@ -52,7 +52,7 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
         return Promise.resolve(finalRes);
       }
     }
-    return Promise.resolve(operationResponse);
+    return Promise.resolve(response);
   }
 
   /**
@@ -90,7 +90,7 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
    * @param {string} body - The response body received after making the original request.
    * @returns {string} result The name of the RP if condition is satisfied else undefined.
    */
-  checkRPNotRegisteredError(body: string): string {
+  checkRPNotRegisteredError(body: string | null): string {
     let result, responseBody;
     if (body) {
       try {
@@ -146,7 +146,7 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
     } catch (err) {
       return Promise.reject(err);
     }
-    if (res.response.status !== 200) {
+    if (res.statusCode !== 200) {
       return Promise.reject(new Error(`Autoregistration of ${provider} failed. Please try registering manually.`));
     }
     let statusRes = false;

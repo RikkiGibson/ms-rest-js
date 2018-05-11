@@ -232,7 +232,10 @@ export function promiseToServiceCallback<T>(promise: Promise<HttpOperationRespon
   }
   return (cb: ServiceCallback<T>): void => {
     promise.then((data: HttpOperationResponse) => {
-      process.nextTick(cb, undefined, data.parsedBody as T, data.request, data.response);
+      data.parsedBody().then(parsedBody =>
+        // TODO: determine whether process.nextTick is really needed
+        // since it requires a polyfill in the browser
+        process.nextTick(cb, undefined, parsedBody, data.request, data));
     }, (err: Error) => {
       process.nextTick(cb, err);
     });

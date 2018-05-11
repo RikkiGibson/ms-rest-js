@@ -113,9 +113,8 @@ export class ExponentialRetryPolicy extends BaseRequestPolicy {
 
   async retry(operationResponse: HttpOperationResponse, retryData?: RetryData, err?: RetryError): Promise<HttpOperationResponse> {
     const self = this;
-    const response = operationResponse.response;
     retryData = self.updateRetryData(retryData, err);
-    if (!utils.objectIsNull(response) && self.shouldRetry(response.status, retryData)) {
+    if (self.shouldRetry(operationResponse.statusCode, retryData)) {
       try {
         await utils.delay(retryData.retryInterval);
         const res: HttpOperationResponse = await this._nextPolicy.sendRequest(operationResponse.request);
