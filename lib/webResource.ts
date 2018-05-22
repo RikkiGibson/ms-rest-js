@@ -314,5 +314,28 @@ export interface RequestOptionsBase {
    * will be applied before the request is sent.
    */
   customHeaders?: { [key: string]: string };
+
+  /**
+   * The abort signal which will be used to cancel requests.
+   */
+  abortSignal?: AbortSignal;
+
   [key: string]: any;
+}
+
+/**
+ * Adds the properties of RequestOptionsBase to a request.
+ * @param httpRequest the request to apply the options to
+ * @param options the options
+ */
+export function applyBaseRequestOptions(httpRequest: WebResource, options?: RequestOptionsBase): void {
+  if (options) {
+    if (options.customHeaders) {
+      for (const headerName of Object.keys(options.customHeaders)) {
+        httpRequest.headers[headerName] = options.customHeaders[headerName];
+      }
+    }
+
+    httpRequest.abortSignal = options.abortSignal;
+  }
 }

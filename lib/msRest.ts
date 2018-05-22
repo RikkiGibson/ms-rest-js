@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
-export { WebResource, RequestPrepareOptions, HttpMethods, ParameterValue, RequestOptionsBase } from "./webResource";
+export { WebResource, RequestPrepareOptions, HttpMethods, ParameterValue, RequestOptionsBase, applyBaseRequestOptions } from "./webResource";
 export { AxiosHttpClient } from "./axiosHttpClient";
 export { HttpClient } from "./httpClient";
 export { HttpHeaders } from "./httpHeaders";
