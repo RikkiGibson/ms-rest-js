@@ -44,7 +44,7 @@ export class ApiKeyCredentials implements ServiceClientCredentials {
   /**
    * Signs a request with the values provided in the inHeader and inQuery parameter.
    *
-   * @param {HttpRequest} The WebResource to be signed.
+   * @param {HttpRequest} The request to be signed.
    * @returns {Promise<HttpRequest>} - The signed request object.
    */
   signRequest(webResource: HttpRequest): Promise<HttpRequest> {

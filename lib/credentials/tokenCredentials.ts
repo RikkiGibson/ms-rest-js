@@ -31,7 +31,7 @@ export class TokenCredentials implements ServiceClientCredentials {
   /**
    * Signs a request with the Authentication header.
    *
-   * @param {HttpRequest} The WebResource to be signed.
+   * @param {HttpRequest} The request to be signed.
    * @return {Promise<HttpRequest>} The signed request object.
    */
   signRequest(webResource: HttpRequest) {

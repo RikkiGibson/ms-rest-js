@@ -27,7 +27,7 @@ export class AxiosHttpClient implements HttpClient {
 
   public async sendRequest(httpRequest: HttpRequest): Promise<HttpOperationResponse> {
     if (!httpRequest) {
-      return Promise.reject(new Error("options (WebResource) cannot be null or undefined and must be of type object."));
+      return Promise.reject(new Error("httpRequest must be provided"));
     }
 
     if (httpRequest.formData) {

@@ -57,7 +57,7 @@ export class HttpRequest {
   /**
    * Prepares the request.
    * @param {RequestPrepareOptions} options - Options to provide for preparing the request.
-   * @returns {object} WebResource Returns the prepared WebResource (HTTP Request) object that needs to be given to the request pipeline.
+   * @returns {object} HttpRequest Returns the prepared HTTP Request object that needs to be given to the request pipeline.
    */
   prepare(options: RequestPrepareOptions) {
     if (options === null || options === undefined || typeof options !== "object") {
@@ -230,8 +230,8 @@ export class HttpRequest {
   }
 
   /**
-   * Clone this WebResource HTTP request object.
-   * @returns {HttpRequest} The clone of this WebResource HTTP request object.
+   * Deep clone this HTTP request object.
+   * @returns {HttpRequest} The clone of this HTTP request object.
    */
   clone(): HttpRequest {
     const result = new HttpRequest(this.url, this.method, this.body, this.query, this.headers && this.headers.clone(), this.rawResponse, this.abortSignal);
@@ -283,7 +283,7 @@ export class HttpRequest {
  * @param {object} [options.deserializationMapper] - Provides information on how to deserialize the response body.
  * @param {boolean} [options.disableJsonStringifyOnBody] - Indicates whether this method should JSON.stringify() the request body. Default value: false.
  * @param {boolean} [options.bodyIsStream] - Indicates whether the request body is a stream (useful for file upload scenarios).
- * @returns {object} WebResource Returns the prepared WebResource (HTTP Request) object that needs to be given to the request pipeline.
+ * @returns {object} HttpRequest Returns the prepared HTTP Request object that needs to be given to the request pipeline.
  */
 export interface RequestPrepareOptions {
   method: HttpMethods;
