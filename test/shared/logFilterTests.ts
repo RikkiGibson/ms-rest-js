@@ -6,10 +6,10 @@ import { HttpHeaders } from "../../lib/httpHeaders";
 import { HttpOperationResponse } from "../../lib/httpOperationResponse";
 import { LogPolicy } from "../../lib/policies/logPolicy";
 import { RequestPolicy, RequestPolicyOptions } from "../../lib/policies/requestPolicy";
-import { WebResource } from "../../lib/webResource";
+import { HttpRequest } from "../../lib/httpRequest";
 
 const emptyRequestPolicy: RequestPolicy = {
-  sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+  sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
     assert(request);
     throw new Error("Not Implemented");
   }
@@ -35,7 +35,7 @@ describe("Log filter", () => {
     let output = "";
     const logger = (message: string): void => { output += message + "\n"; };
     const lf = new LogPolicy(emptyRequestPolicy, new RequestPolicyOptions(), logger);
-    const req = new WebResource("https://foo.com", "PUT", { "a": 1 });
+    const req = new HttpRequest("https://foo.com", "PUT", { "a": 1 });
     const opRes: HttpOperationResponse = { request: req, status: 200, headers: new HttpHeaders(), bodyAsText: null };
     lf.logResponse(opRes).then(() => {
       // console.dir(output, { depth: null });

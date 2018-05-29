@@ -4,7 +4,7 @@ import * as assert from "assert";
 import * as should from "should";
 import { AxiosHttpClient } from "../../lib/axiosHttpClient";
 import { baseURL } from "../testUtils";
-import { WebResource } from "../../lib/webResource";
+import { HttpRequest } from "../../lib/httpRequest";
 import { isNode } from "../../lib/msRest";
 
 function getAbortController(): AbortController {
@@ -20,7 +20,7 @@ function getAbortController(): AbortController {
 
 describe("axiosHttpClient", () => {
   it("should send HTTP requests", async () => {
-    const request = new WebResource(`${baseURL}/example-index.html`, "GET");
+    const request = new HttpRequest(`${baseURL}/example-index.html`, "GET");
     const httpClient = new AxiosHttpClient();
 
     const response = await httpClient.sendRequest(request);
@@ -89,7 +89,7 @@ describe("axiosHttpClient", () => {
   });
 
   it("should return a response instead of throwing for awaited 404", async () => {
-    const request = new WebResource(`${baseURL}/nonexistent`, "GET");
+    const request = new HttpRequest(`${baseURL}/nonexistent`, "GET");
     const httpClient = new AxiosHttpClient();
 
     const response = await httpClient.sendRequest(request);
@@ -101,7 +101,7 @@ describe("axiosHttpClient", () => {
     this.timeout(2000);
 
     const controller = getAbortController();
-    const request = new WebResource(`${baseURL}/fileupload`, "POST", new Uint8Array(1024*1024*100), undefined, undefined, true, controller.signal);
+    const request = new HttpRequest(`${baseURL}/fileupload`, "POST", new Uint8Array(1024*1024*100), undefined, undefined, true, controller.signal);
     const client = new AxiosHttpClient();
     const promise = client.sendRequest(request);
     await new Promise((resolve) => {
@@ -126,14 +126,14 @@ describe("axiosHttpClient", () => {
 
     const client = new AxiosHttpClient();
 
-    const request1 = new WebResource(`${baseURL}/set-cookie`);
+    const request1 = new HttpRequest(`${baseURL}/set-cookie`);
     await client.sendRequest(request1);
 
-    const request2 = new WebResource(`${baseURL}/cookie`);
+    const request2 = new HttpRequest(`${baseURL}/cookie`);
     const response2 = await client.sendRequest(request2);
     should(response2.headers.get("Cookie")).equal("data=123456");
 
-    const request3 = new WebResource(`${baseURL}/cookie`, "GET", undefined, undefined, { Cookie: "data=abcdefg" });
+    const request3 = new HttpRequest(`${baseURL}/cookie`, "GET", undefined, undefined, { Cookie: "data=abcdefg" });
     const response3 = await client.sendRequest(request3);
     should(response3.headers.get("Cookie")).equal("data=abcdefg");
   });
@@ -145,8 +145,8 @@ describe("axiosHttpClient", () => {
     const controller = getAbortController();
     const buf = new Uint8Array(1024*1024*100);
     const requests = [
-      new WebResource(`${baseURL}/fileupload`, "POST", buf, undefined, undefined, true, controller.signal),
-      new WebResource(`${baseURL}/fileupload`, "POST", buf, undefined, undefined, true, controller.signal)
+      new HttpRequest(`${baseURL}/fileupload`, "POST", buf, undefined, undefined, true, controller.signal),
+      new HttpRequest(`${baseURL}/fileupload`, "POST", buf, undefined, undefined, true, controller.signal)
     ];
     const client = new AxiosHttpClient();
     const promises = requests.map(r => client.sendRequest(r));

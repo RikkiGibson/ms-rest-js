@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 import { HttpOperationResponse } from "../httpOperationResponse";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { BaseRequestPolicy, RequestPolicyCreator, RequestPolicy, RequestPolicyOptions } from "./requestPolicy";
 import { Serializer, Mapper } from "../serializer";
 import { OperationSpec, OperationParameterType } from "../msRest";
@@ -26,7 +26,7 @@ export class SerializationPolicy extends BaseRequestPolicy {
     super(nextPolicy, options);
   }
 
-  public sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+  public sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
     let result: Promise<HttpOperationResponse>;
     try {
       this.serializeRequestBody(request);
@@ -40,9 +40,9 @@ export class SerializationPolicy extends BaseRequestPolicy {
   /**
    * Serialize the provided HTTP request's body based on the requestBodyMapper assigned to the HTTP
    * request.
-   * @param {WebResource} request - The HTTP request that will have its body serialized.
+   * @param {HttpRequest} request - The HTTP request that will have its body serialized.
    */
-  public serializeRequestBody(request: WebResource): void {
+  public serializeRequestBody(request: HttpRequest): void {
     const operationSpec: OperationSpec | undefined = request.operationSpec;
     if (operationSpec) {
       const bodyMapper: Mapper | undefined = operationSpec.requestBodyMapper;

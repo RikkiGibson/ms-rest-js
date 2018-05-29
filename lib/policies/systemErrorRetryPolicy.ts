@@ -3,7 +3,7 @@
 
 import { HttpOperationResponse } from "../httpOperationResponse";
 import * as utils from "../util/utils";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { BaseRequestPolicy, RequestPolicy, RequestPolicyCreator, RequestPolicyOptions } from "./requestPolicy";
 
 export interface RetryData {
@@ -106,7 +106,7 @@ export class SystemErrorRetryPolicy extends BaseRequestPolicy {
     return retryData;
   }
 
-  async retry(request: WebResource, operationResponse: HttpOperationResponse, retryData?: RetryData, err?: RetryError): Promise<HttpOperationResponse> {
+  async retry(request: HttpRequest, operationResponse: HttpOperationResponse, retryData?: RetryData, err?: RetryError): Promise<HttpOperationResponse> {
     const self = this;
     retryData = self.updateRetryData(retryData, err);
     if (err && err.code && self.shouldRetry(retryData) &&
@@ -130,7 +130,7 @@ export class SystemErrorRetryPolicy extends BaseRequestPolicy {
     }
   }
 
-  public async sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+  public async sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
     const response: HttpOperationResponse = await this._nextPolicy.sendRequest(request.clone());
     return this.retry(request, response); // See: https://github.com/Microsoft/TypeScript/issues/7426
   }

@@ -5,7 +5,7 @@ import * as xml2js from "isomorphic-xml2js";
 import * as uuid from "uuid";
 import { HttpOperationResponse } from "../httpOperationResponse";
 import { RestError } from "../restError";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { Constants } from "./constants";
 
 /**
@@ -75,8 +75,8 @@ export function stripResponse(response: HttpOperationResponse): any {
  *
  * @return {object} strippedRequest - The stripped version of Http Request.
  */
-export function stripRequest(request: WebResource): WebResource {
-  let strippedRequest = new WebResource();
+export function stripRequest(request: HttpRequest): HttpRequest {
+  let strippedRequest = new HttpRequest();
   try {
     strippedRequest = request.clone();
     if (strippedRequest.headers) {
@@ -187,7 +187,7 @@ export function delay<T>(t: number, value?: T): Promise<T> {
  * @property {WebResource}  request           - The raw/actual request sent to the server if an error did not occur.
  * @property {HttpOperationResponse} response  - The raw/actual response from the server if an error did not occur.
  */
-export interface ServiceCallback<TResult> { (err: Error | RestError, result?: TResult, request?: WebResource, response?: HttpOperationResponse): void; }
+export interface ServiceCallback<TResult> { (err: Error | RestError, result?: TResult, request?: HttpRequest, response?: HttpOperationResponse): void; }
 
 /**
  * Converts a Promise to a callback.

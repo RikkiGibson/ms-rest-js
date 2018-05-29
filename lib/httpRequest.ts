@@ -10,14 +10,14 @@ export type HttpMethods = "GET" | "PUT" | "POST" | "DELETE" | "PATCH" | "HEAD" |
 export type HttpRequestBody = Blob | string | ArrayBuffer | ArrayBufferView | (() => NodeJS.ReadableStream);
 
 /**
- * Creates a new WebResource object.
+ * Creates a new HttpRequest object.
  *
  * This class provides an abstraction over a REST call by being library / implementation agnostic and wrapping the necessary
  * properties to initiate a request.
  *
  * @constructor
  */
-export class WebResource {
+export class HttpRequest {
   url: string;
   method: HttpMethods;
   body?: any;
@@ -231,10 +231,10 @@ export class WebResource {
 
   /**
    * Clone this WebResource HTTP request object.
-   * @returns {WebResource} The clone of this WebResource HTTP request object.
+   * @returns {HttpRequest} The clone of this WebResource HTTP request object.
    */
-  clone(): WebResource {
-    const result = new WebResource(this.url, this.method, this.body, this.query, this.headers && this.headers.clone(), this.rawResponse, this.abortSignal);
+  clone(): HttpRequest {
+    const result = new HttpRequest(this.url, this.method, this.body, this.query, this.headers && this.headers.clone(), this.rawResponse, this.abortSignal);
     result.formData = this.formData;
     result.operationSpec = this.operationSpec;
     return result;

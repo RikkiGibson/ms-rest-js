@@ -10,7 +10,7 @@ import { HttpHeaders } from "./httpHeaders";
 import { HttpOperationResponse } from "./httpOperationResponse";
 import { RestError } from "./restError";
 import { isNode } from "./util/utils";
-import { WebResource } from "./webResource";
+import { HttpRequest } from "./httpRequest";
 
 const axiosClient = axios.create();
 
@@ -25,7 +25,7 @@ if (isNode) {
 export class AxiosHttpClient implements HttpClient {
   private readonly cookieJar = isNode ? new tough.CookieJar() : undefined;
 
-  public async sendRequest(httpRequest: WebResource): Promise<HttpOperationResponse> {
+  public async sendRequest(httpRequest: HttpRequest): Promise<HttpOperationResponse> {
     if (!httpRequest) {
       return Promise.reject(new Error("options (WebResource) cannot be null or undefined and must be of type object."));
     }

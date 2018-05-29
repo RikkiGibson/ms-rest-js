@@ -3,7 +3,7 @@
 
 import { HttpOperationResponse } from "../httpOperationResponse";
 import * as utils from "../util/utils";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { BaseRequestPolicy, RequestPolicyCreator, RequestPolicy, RequestPolicyOptions } from "./requestPolicy";
 
 export interface RetryData {
@@ -111,7 +111,7 @@ export class ExponentialRetryPolicy extends BaseRequestPolicy {
     return retryData;
   }
 
-  async retry(request: WebResource, response: HttpOperationResponse, retryData?: RetryData, err?: RetryError): Promise<HttpOperationResponse> {
+  async retry(request: HttpRequest, response: HttpOperationResponse, retryData?: RetryData, err?: RetryError): Promise<HttpOperationResponse> {
     const self = this;
     retryData = self.updateRetryData(retryData, err);
     if (self.shouldRetry(response.status, retryData)) {
@@ -132,7 +132,7 @@ export class ExponentialRetryPolicy extends BaseRequestPolicy {
     }
   }
 
-  public async sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+  public async sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
     const response: HttpOperationResponse = await this._nextPolicy.sendRequest(request.clone());
     return this.retry(request, response);
   }

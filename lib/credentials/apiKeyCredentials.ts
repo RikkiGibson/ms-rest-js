@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 import { HttpHeaders } from "../httpHeaders";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { ServiceClientCredentials } from "./serviceClientCredentials";
 
 /**
@@ -44,10 +44,10 @@ export class ApiKeyCredentials implements ServiceClientCredentials {
   /**
    * Signs a request with the values provided in the inHeader and inQuery parameter.
    *
-   * @param {WebResource} The WebResource to be signed.
-   * @returns {Promise<WebResource>} - The signed request object.
+   * @param {HttpRequest} The WebResource to be signed.
+   * @returns {Promise<HttpRequest>} - The signed request object.
    */
-  signRequest(webResource: WebResource): Promise<WebResource> {
+  signRequest(webResource: HttpRequest): Promise<HttpRequest> {
     if (!webResource) {
       return Promise.reject(new Error(`webResource cannot be null or undefined and must be of type "object".`));
     }

@@ -7,11 +7,11 @@ import { HttpOperationResponse } from "../../../lib/httpOperationResponse";
 import { RequestPolicy, RequestPolicyOptions } from "../../../lib/policies/requestPolicy";
 import { SerializationPolicy } from "../../../lib/policies/serializationPolicy";
 import { Serializer } from "../../../lib/serializer";
-import { WebResource } from "../../../lib/webResource";
+import { HttpRequest } from "../../../lib/httpRequest";
 
 describe("serializationPolicy", () => {
   const mockPolicy: RequestPolicy = {
-    sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+    sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
       return Promise.resolve({
         request: request,
         status: 200,
@@ -25,7 +25,7 @@ describe("serializationPolicy", () => {
   it(`should not modify a request that has no request body mapper`, async () => {
     const serializationPolicy = new SerializationPolicy(mockPolicy, new RequestPolicyOptions(), serializer);
 
-    const request = new WebResource();
+    const request = new HttpRequest();
     request.body = "hello there!";
 
     await serializationPolicy.sendRequest(request);

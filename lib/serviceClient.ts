@@ -21,7 +21,7 @@ import { systemErrorRetryPolicy } from "./policies/systemErrorRetryPolicy";
 import { Serializer, serializeObject } from "./serializer";
 import { Constants } from "./util/constants";
 import * as utils from "./util/utils";
-import { RequestPrepareOptions, WebResource } from "./webResource";
+import { RequestPrepareOptions, HttpRequest } from "./httpRequest";
 import { URLBuilder } from "./url";
 import { QueryCollectionFormat, getQueryCollectionFormatSeparator } from "./queryCollectionFormat";
 
@@ -148,18 +148,18 @@ export class ServiceClient {
   /**
    * Send the provided httpRequest.
    */
-  async sendRequest(options: RequestPrepareOptions | WebResource): Promise<HttpOperationResponse> {
+  async sendRequest(options: RequestPrepareOptions | HttpRequest): Promise<HttpOperationResponse> {
     if (options === null || options === undefined || typeof options !== "object") {
       throw new Error("options cannot be null or undefined and it must be of type object.");
     }
 
-    let httpRequest: WebResource;
+    let httpRequest: HttpRequest;
     try {
-      if (options instanceof WebResource) {
+      if (options instanceof HttpRequest) {
         options.validateRequestProperties();
         httpRequest = options;
       } else {
-        httpRequest = new WebResource();
+        httpRequest = new HttpRequest();
         httpRequest = httpRequest.prepare(options);
       }
     } catch (error) {
@@ -184,10 +184,10 @@ export class ServiceClient {
 
   /**
    * Send an HTTP request that is populated using the provided OperationSpec.
-   * @param {WebResource} httpRequest - The HTTP request to populate and then to send.
+   * @param {HttpRequest} httpRequest - The HTTP request to populate and then to send.
    * @param {operationSpec} operationSpec - The OperationSpec to use to populate the httpRequest.
    */
-  async sendOperationRequest(httpRequest: WebResource, operationArguments: OperationArguments, operationSpec: OperationSpec): Promise<HttpOperationResponse> {
+  async sendOperationRequest(httpRequest: HttpRequest, operationArguments: OperationArguments, operationSpec: OperationSpec): Promise<HttpOperationResponse> {
     httpRequest.method = operationSpec.httpMethod;
     httpRequest.operationSpec = operationSpec;
 

@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 import { HttpOperationResponse } from "../httpOperationResponse";
 import * as utils from "../util/utils";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { BaseRequestPolicy, RequestPolicy, RequestPolicyCreator, RequestPolicyOptions } from "./requestPolicy";
 
 export function rpRegistrationPolicy(retryTimeout = 30): RequestPolicyCreator {
@@ -17,12 +17,12 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
     super(nextPolicy, options);
   }
 
-  public async sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+  public async sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
     const response: HttpOperationResponse = await this._nextPolicy.sendRequest(request.clone());
     return this.registerIfNeeded(request, response);
   }
 
-  async registerIfNeeded(request: WebResource, response: HttpOperationResponse): Promise<HttpOperationResponse> {
+  async registerIfNeeded(request: HttpRequest, response: HttpOperationResponse): Promise<HttpOperationResponse> {
     let rpName, urlPrefix;
     if (response.status === 409) {
       rpName = this.checkRPNotRegisteredError(response.bodyAsText as string);
@@ -56,11 +56,11 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
 
   /**
    * Reuses the headers of the original request and url (if specified).
-   * @param {WebResource} originalRequest The original request
+   * @param {HttpRequest} originalRequest The original request
    * @param {boolean} reuseUrlToo Should the url from the original request be reused as well. Default false.
    * @returns {object} reqOptions - A new request object with desired headers.
    */
-  getRequestEssentials(originalRequest: WebResource, reuseUrlToo = false): any {
+  getRequestEssentials(originalRequest: HttpRequest, reuseUrlToo = false): any {
     const reqOptions: any = {
       headers: {}
     };
@@ -133,7 +133,7 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
    * with a message that the provider is not registered.
    * @param {registrationCallback} callback - The callback that handles the RP registration
    */
-  async registerRP(urlPrefix: string, provider: string, originalRequest: WebResource): Promise<boolean> {
+  async registerRP(urlPrefix: string, provider: string, originalRequest: HttpRequest): Promise<boolean> {
     const postUrl = `${urlPrefix}providers/${provider}/register?api-version=2016-02-01`;
     const getUrl = `${urlPrefix}providers/${provider}?api-version=2016-02-01`;
     const reqOptions = this.getRequestEssentials(originalRequest);
@@ -165,7 +165,7 @@ export class RPRegistrationPolicy extends BaseRequestPolicy {
    * with a message that the provider is not registered.
    * @returns {Promise<boolean>} promise - True if RP Registration is successful.
    */
-  async getRegistrationStatus(url: string, originalRequest: WebResource): Promise<boolean> {
+  async getRegistrationStatus(url: string, originalRequest: HttpRequest): Promise<boolean> {
     const reqOptions: any = this.getRequestEssentials(originalRequest);
     let res: HttpOperationResponse;
     let result = false;

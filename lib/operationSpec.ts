@@ -5,7 +5,7 @@ import { OperationHeaderParameter } from "./operationHeaderParameter";
 import { OperationQueryParameter } from "./operationQueryParameter";
 import { OperationURLParameter } from "./operationURLParameter";
 import { Mapper } from "./serializer";
-import { HttpMethods } from "./webResource";
+import { HttpMethods } from "./httpRequest";
 import { OperationFormDataParameter } from "./operationFormDataParameter";
 import { OperationParameterType } from "./msRest";
 

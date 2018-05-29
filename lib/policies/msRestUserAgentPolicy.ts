@@ -6,7 +6,7 @@ import { HttpHeaders } from "../httpHeaders";
 import { HttpOperationResponse } from "../httpOperationResponse";
 import { Constants } from "../util/constants";
 import { isNode } from "../util/utils";
-import { WebResource } from "../webResource";
+import { HttpRequest } from "../httpRequest";
 import { BaseRequestPolicy, RequestPolicy, RequestPolicyCreator, RequestPolicyOptions } from "./requestPolicy";
 
 const HeaderConstants = Constants.HeaderConstants;
@@ -26,7 +26,7 @@ export class MsRestUserAgentPolicy extends BaseRequestPolicy {
     this.userAgentInfo = userAgentInfo;
   }
 
-  tagRequest(request: WebResource): void {
+  tagRequest(request: HttpRequest): void {
     if (isNode) {
       const osInfo = `(${os.arch()}-${os.type()}-${os.release()})`;
       if (this.userAgentInfo.indexOf(osInfo) === -1) {
@@ -54,7 +54,7 @@ export class MsRestUserAgentPolicy extends BaseRequestPolicy {
     }
   }
 
-  addUserAgentHeader(request: WebResource): void {
+  addUserAgentHeader(request: HttpRequest): void {
     if (!request.headers) {
       request.headers = new HttpHeaders();
     }
@@ -63,7 +63,7 @@ export class MsRestUserAgentPolicy extends BaseRequestPolicy {
     }
   }
 
-  public async sendRequest(request: WebResource): Promise<HttpOperationResponse> {
+  public async sendRequest(request: HttpRequest): Promise<HttpOperationResponse> {
     this.addUserAgentHeader(request);
     return await this._nextPolicy.sendRequest(request);
   }

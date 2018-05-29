@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
-import { WebResource } from "./webResource";
+import { HttpRequest } from "./httpRequest";
 import { HttpHeaders } from "./httpHeaders";
 
 /**
@@ -15,7 +15,7 @@ export interface HttpOperationResponse<TBody = any, THeaders = any> {
   /**
    * The raw request
    */
-  request: WebResource;
+  request: HttpRequest;
 
   /**
    * The HTTP response status (e.g. 200)

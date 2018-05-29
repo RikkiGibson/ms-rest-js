@@ -15,9 +15,9 @@ describe("Token credentials", () => {
   describe("usage", () => {
     it("should set auth header with bearer scheme in request", (done) => {
       const creds = new TokenCredentials(dummyToken);
-      const request = new msRest.WebResource();
+      const request = new msRest.HttpRequest();
 
-      creds.signRequest(request).then((signedRequest: msRest.WebResource) => {
+      creds.signRequest(request).then((signedRequest: msRest.HttpRequest) => {
         should.exist(signedRequest.headers.get("authorization"));
         should(signedRequest.headers.get("authorization")).match(new RegExp("^Bearer\\s+" + dummyToken + "$"));
         done();
@@ -26,8 +26,8 @@ describe("Token credentials", () => {
 
     it("should set auth header with custom scheme in request", (done) => {
       const creds = new TokenCredentials(dummyToken, fakeScheme);
-      const request = new msRest.WebResource();
-      creds.signRequest(request).then((signedRequest: msRest.WebResource) => {
+      const request = new msRest.HttpRequest();
+      creds.signRequest(request).then((signedRequest: msRest.HttpRequest) => {
         should.exist(signedRequest.headers.get("authorization"));
         should(signedRequest.headers.get("authorization")).match(new RegExp("^" + fakeScheme + "\\s+" + dummyToken + "$"));
         done();
@@ -62,8 +62,8 @@ describe("Basic Authentication credentials", () => {
   describe("usage", () => {
     it("should base64 encode the username and password and set auth header with baisc scheme in request", (done) => {
       const creds = new BasicAuthenticationCredentials(dummyuserName, dummyPassword);
-      const request = new msRest.WebResource();
-      creds.signRequest(request).then((signedRequest: msRest.WebResource) => {
+      const request = new msRest.HttpRequest();
+      creds.signRequest(request).then((signedRequest: msRest.HttpRequest) => {
         should.exist(signedRequest.headers.get("authorization"));
         should(signedRequest.headers.get("authorization")).match(new RegExp("^Basic\\s+" + encodedCredentials + "$"));
         done();
@@ -72,9 +72,9 @@ describe("Basic Authentication credentials", () => {
 
     it("should base64 encode the username and password and set auth header with custom scheme in request", (done) => {
       const creds = new BasicAuthenticationCredentials(dummyuserName, dummyPassword, fakeScheme);
-      const request = new msRest.WebResource();
+      const request = new msRest.HttpRequest();
 
-      creds.signRequest(request).then((signedRequest: msRest.WebResource) => {
+      creds.signRequest(request).then((signedRequest: msRest.HttpRequest) => {
         should.exist(signedRequest.headers.get("authorization"));
         should(signedRequest.headers.get("authorization")).match(new RegExp("^" + fakeScheme + "\\s+" + encodedCredentials + "$"));
         done();
@@ -107,7 +107,7 @@ describe("ApiKey credentials", () => {
   describe("usage", function () {
     it("should set header parameters properly in request", async function () {
       const creds = new ApiKeyCredentials({inHeader: {"key1": "value1", "key2": "value2"}});
-      const request = new msRest.WebResource();
+      const request = new msRest.HttpRequest();
       request.headers = new msRest.HttpHeaders();
 
       await creds.signRequest(request);
@@ -123,7 +123,7 @@ describe("ApiKey credentials", () => {
       const request = {
         headers: {},
         url: "https://example.com"
-      } as msRest.WebResource;
+      } as msRest.HttpRequest;
 
       await creds.signRequest(request);
       request.url.should.equal("https://example.com?key1=value1&key2=value2");
@@ -134,7 +134,7 @@ describe("ApiKey credentials", () => {
       const request = {
         headers: {},
         url: "https://example.com?q1=v2"
-      } as msRest.WebResource;
+      } as msRest.HttpRequest;
 
       await creds.signRequest(request);
       request.url.should.equal("https://example.com?q1=v2&key1=value1&key2=value2");
