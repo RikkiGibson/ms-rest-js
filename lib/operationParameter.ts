@@ -2,7 +2,8 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 import { QueryCollectionFormat } from "./queryCollectionFormat";
-import { Mapper } from "./serializer";
+import { Mapper} from "./serializer";
+import { MapperKey as K } from "./mapperKey";
 
 export type ParameterPath = string | string[] | { [propertyName: string]: ParameterPath };
 
@@ -65,7 +66,7 @@ export function getPathStringFromParameterPath(parameterPath: ParameterPath, map
   } else if (Array.isArray(parameterPath)) {
     result = parameterPath.join(".");
   } else {
-    result = mapper.serializedName;
+    result = mapper[K.serializedName];
   }
   return result;
 }

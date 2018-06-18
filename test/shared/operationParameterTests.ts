@@ -3,6 +3,7 @@
 
 import * as assert from "assert";
 import { getPathStringFromParameter, OperationParameter } from "../../lib/operationParameter";
+import { MapperKey as K } from '../../lib/mapperKey';
 
 describe("getParameterPathString()", () => {
   it("should throw when given undefined", () => {
@@ -18,9 +19,9 @@ describe("getParameterPathString()", () => {
     const parameter: OperationParameter = {
       parameterPath: "pathToParameterValue",
       mapper: {
-        serializedName: "value",
-        type: {
-          name: "number"
+        [K.serializedName]: "value",
+        [K.type]: {
+          [K.name]: "number"
         }
       }
     };
@@ -31,9 +32,9 @@ describe("getParameterPathString()", () => {
     const parameter: OperationParameter = {
       parameterPath: ["path", "to", "parameter", "value"],
       mapper: {
-        serializedName: "value",
-        type: {
-          name: "number"
+        [K.serializedName]: "value",
+        [K.type]: {
+          [K.name]: "number"
         }
       }
     };
@@ -44,9 +45,9 @@ describe("getParameterPathString()", () => {
     const parameter: OperationParameter = {
       parameterPath: ["pa.th", "to", "par.ameter", "valu.e"],
       mapper: {
-        serializedName: "value",
-        type: {
-          name: "number"
+        [K.serializedName]: "value",
+        [K.type]: {
+          [K.name]: "number"
         }
       }
     };
@@ -60,9 +61,9 @@ describe("getParameterPathString()", () => {
         "b": "B"
       },
       mapper: {
-        serializedName: "value",
-        type: {
-          name: "number"
+        [K.serializedName]: "value",
+        [K.type]: {
+          [K.name]: "number"
         }
       }
     };

@@ -20,6 +20,7 @@ import { signingPolicy } from "./policies/signingPolicy";
 import { systemErrorRetryPolicy } from "./policies/systemErrorRetryPolicy";
 import { QueryCollectionFormat } from "./queryCollectionFormat";
 import { Mapper, Serializer } from "./serializer";
+import { MapperKey as K } from "./mapperKey";
 import { URLBuilder } from "./url";
 import { Constants } from "./util/constants";
 import * as utils from "./util/utils";
@@ -195,7 +196,7 @@ export class ServiceClient {
           if (!urlParameter.skipEncoding) {
             urlParameterValue = encodeURIComponent(urlParameterValue);
           }
-          requestUrl.replaceAll(`{${urlParameter.mapper.serializedName || getPathStringFromParameter(urlParameter)}}`, urlParameterValue);
+          requestUrl.replaceAll(`{${urlParameter.mapper[K.serializedName] || getPathStringFromParameter(urlParameter)}}`, urlParameterValue);
         }
       }
       if (operationSpec.queryParameters && operationSpec.queryParameters.length > 0) {
@@ -219,7 +220,7 @@ export class ServiceClient {
             if (!queryParameter.skipEncoding) {
               queryParameterValue = encodeURIComponent(queryParameterValue);
             }
-            requestUrl.setQueryParameter(queryParameter.mapper.serializedName || getPathStringFromParameter(queryParameter), queryParameterValue);
+            requestUrl.setQueryParameter(queryParameter.mapper[K.serializedName] || getPathStringFromParameter(queryParameter), queryParameterValue);
           }
         }
       }
@@ -230,7 +231,7 @@ export class ServiceClient {
           let headerValue: any = getOperationArgumentValueFromParameter(operationArguments, headerParameter, operationSpec.serializer);
           if (headerValue != undefined) {
             headerValue = operationSpec.serializer.serialize(headerParameter.mapper, headerValue, getPathStringFromParameter(headerParameter));
-            httpRequest.headers.set(headerParameter.mapper.serializedName || getPathStringFromParameter(headerParameter), headerValue);
+            httpRequest.headers.set(headerParameter.mapper[K.serializedName] || getPathStringFromParameter(headerParameter), headerValue);
           }
         }
       }
@@ -264,7 +265,7 @@ export class ServiceClient {
         for (const formDataParameter of operationSpec.formDataParameters) {
           const formDataParameterValue: any = getOperationArgumentValueFromParameter(operationArguments, formDataParameter, operationSpec.serializer);
           if (formDataParameterValue != undefined) {
-            const formDataParameterPropertyName: string = formDataParameter.mapper.serializedName || getPathStringFromParameter(formDataParameter);
+            const formDataParameterPropertyName: string = formDataParameter.mapper[K.serializedName] || getPathStringFromParameter(formDataParameter);
             httpRequest.formData[formDataParameterPropertyName] = operationSpec.serializer.serialize(formDataParameter.mapper, formDataParameterValue, getPathStringFromParameter(formDataParameter));
           }
         }
@@ -352,7 +353,7 @@ function getOperationArgumentValueFromParameterPath(operationArguments: Operatio
       }
     } else {
       for (const propertyName in parameterPath) {
-        const propertyMapper: Mapper = parameterMapper.type.modelProperties[propertyName];
+        const propertyMapper: Mapper = parameterMapper[K.type][K.modelProperties][propertyName];
         const propertyPath: ParameterPath = parameterPath[propertyName];
         const propertyValue: any = getOperationArgumentValueFromParameterPath(operationArguments, propertyPath, propertyMapper, serializer);
         // Serialize just for validation purposes.

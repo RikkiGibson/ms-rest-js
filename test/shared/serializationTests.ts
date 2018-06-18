@@ -7,6 +7,7 @@ const should = require("should");
 
 import { TestClient } from "./data/TestClient/lib/testClient";
 import { Mappers } from "./data/TestClient/lib/models/mappers";
+import { MapperKey as K } from '../../lib/msRest';
 let Serializer = new msRest.Serializer({});
 let valid_uuid = "ceaafd1e-f936-429f-bbfc-82ee75dddc33";
 
@@ -124,31 +125,31 @@ describe("msrest", function () {
   describe("serialize", function () {
     let invalid_uuid = "abcd-efgd90-90890jkh";
     it("should correctly serialize a string if the type is 'any'", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "any" }, required: false, serializedName: "any" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "any" }, [K.required]: false, [K.serializedName]: "any" };
       let serializedObject = Serializer.serialize(mapper, "foo", "anyBody");
       serializedObject.should.equal("foo");
       done();
     });
     it("should correctly serialize an array if the type is 'any'", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "any" }, required: false, serializedName: "any" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "any" }, [K.required]: false, [K.serializedName]: "any" };
       let serializedObject = Serializer.serialize(mapper, [1, 2], "anyBody");
       assert.deepEqual(serializedObject, [1, 2]);
       done();
     });
     it("should correctly serialize a string", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "String" }, required: false, serializedName: "string" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "String" }, [K.required]: false, [K.serializedName]: "string" };
       let serializedObject = Serializer.serialize(mapper, "foo", "stringBody");
       serializedObject.should.equal("foo");
       done();
     });
     it("should correctly serialize a uuid", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "Uuid" }, required: false, serializedName: "Uuid" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "Uuid" }, [K.required]: false, [K.serializedName]: "Uuid" };
       let serializedObject = Serializer.serialize(mapper, valid_uuid, "uuidBody");
       serializedObject.should.equal(valid_uuid);
       done();
     });
     it("should throw an error if the value is not a valid Uuid", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "Uuid" }, required: false, serializedName: "Uuid" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "Uuid" }, [K.required]: false, [K.serializedName]: "Uuid" };
       try {
         Serializer.serialize(mapper, invalid_uuid, "uuidBody");
       } catch (error) {
@@ -157,25 +158,25 @@ describe("msrest", function () {
       }
     });
     it("should correctly serialize a number", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "Number" }, required: false, serializedName: "Number" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "Number" }, [K.required]: false, [K.serializedName]: "Number" };
       let serializedObject = Serializer.serialize(mapper, 1.506, "stringBody");
       serializedObject.should.equal(1.506);
       done();
     });
     it("should correctly serialize a boolean", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "Boolean" }, required: false, serializedName: "Boolean" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "Boolean" }, [K.required]: false, [K.serializedName]: "Boolean" };
       let serializedObject = Serializer.serialize(mapper, false, "stringBody");
       serializedObject.should.equal(false);
       done();
     });
     it("should correctly serialize an Enum", function (done) {
-      let mapper: msRest.EnumMapper = { type: { name: "Enum", allowedValues: [1, 2, 3, 4] }, required: false, serializedName: "Enum" };
+      let mapper: msRest.EnumMapper = { [K.type]: { [K.name]: "Enum", [K.allowedValues]: [1, 2, 3, 4] }, [K.required]: false, [K.serializedName]: "Enum" };
       let serializedObject = Serializer.serialize(mapper, 1, "enumBody");
       serializedObject.should.equal(1);
       done();
     });
     it("should throw an error if the value is not valid for an Enum", function (done) {
-      let mapper: msRest.EnumMapper = { type: { name: "Enum", allowedValues: [1, 2, 3, 4] }, required: false, serializedName: "Enum" };
+      let mapper: msRest.EnumMapper = { [K.type]: { [K.name]: "Enum", [K.allowedValues]: [1, 2, 3, 4] }, [K.required]: false, [K.serializedName]: "Enum" };
       try {
         Serializer.serialize(mapper, 6, "enumBody");
       } catch (error) {
@@ -185,7 +186,7 @@ describe("msrest", function () {
     });
 
     it("should correctly serialize a ByteArray Object", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "ByteArray" }, required: false, serializedName: "ByteArray" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "ByteArray" }, [K.required]: false, [K.serializedName]: "ByteArray" };
       let byteArray = stringToByteArray("Javascript");
       let base64str = "SmF2YXNjcmlwdA==";
       let serializedObject = Serializer.serialize(mapper, byteArray, "stringBody");
@@ -196,51 +197,51 @@ describe("msrest", function () {
     it("should correctly serialize a Date Object", function (done) {
       let dateObj = new Date("2015-01-01");
       let dateISO = "2015-01-01";
-      let mapper: msRest.Mapper = { type: { name: "Date" }, required: false, serializedName: "Date" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "Date" }, [K.required]: false, [K.serializedName]: "Date" };
       Serializer.serialize(mapper, dateObj, "dateObj").should.equal(dateISO);
       done();
     });
     it("should correctly serialize a Date object with max value", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "DateTime" }, required: false, serializedName: "DateTime" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "DateTime" }, [K.required]: false, [K.serializedName]: "DateTime" };
       let serializedDateString = Serializer.serialize(mapper, new Date("9999-12-31T23:59:59-12:00"), "dateTimeObj");
       should.equal(serializedDateString, "+010000-01-01T11:59:59.000Z");
       done();
     });
     it("should correctly serialize a Date object with max value and format UnixTime", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "UnixTime" }, required: false, serializedName: "UnixTime" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "UnixTime" }, [K.required]: false, [K.serializedName]: "UnixTime" };
       let serializedDate = Serializer.serialize(mapper, new Date("9999-12-31T23:59:59-12:00"), "dateTimeObj");
       serializedDate.should.equal(253402343999);
       done();
     });
     it("should correctly serialize a string in DateTimeRfc1123", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "DateTimeRfc1123" }, required: false, serializedName: "DateTimeRfc1123" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "DateTimeRfc1123" }, [K.required]: false, [K.serializedName]: "DateTimeRfc1123" };
       let rfc = new Date("Mon, 01 Jan 0001 00:00:00 GMT");
       let serializedDateString = Serializer.serialize(mapper, rfc, "dateTimeObj");
       serializedDateString.should.equal("Mon, 01 Jan 2001 00:00:00 GMT");
       done();
     });
     it("should correctly serialize an ISO 8601 duration", function () {
-      let mapper: msRest.Mapper = { type: { name: "TimeSpan" }, required: false, serializedName: "TimeSpan" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "TimeSpan" }, [K.required]: false, [K.serializedName]: "TimeSpan" };
       let duration = "P123DT22H14M12.011S";
       let serializedDateString = Serializer.serialize(mapper, duration, "dateTimeObj");
       serializedDateString.should.equal(duration);
     });
     it("should throw an error when given an invalid ISO 8601 duration", function () {
-      let mapper: msRest.Mapper = { type: { name: "TimeSpan" }, required: false, serializedName: "TimeSpan" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "TimeSpan" }, [K.required]: false, [K.serializedName]: "TimeSpan" };
       let duration = "P123Z42DT22H14M12.011S";
       (() => Serializer.serialize(mapper, duration, "dateTimeObj")).should.throw(/must be a string in ISO 8601 format/);
     });
 
     it("should correctly serialize an array of primitives", function (done) {
       let mapper: msRest.SequenceMapper = {
-        required: false,
-        serializedName: "Sequence",
-        type: {
-          name: "Sequence",
-          element: {
-            type: { name: "String" },
-            required: true,
-            serializedName: "sequenceElement"
+        [K.required]: false,
+        [K.serializedName]: "Sequence",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.type]: { [K.name]: "String" },
+            [K.required]: true,
+            [K.serializedName]: "sequenceElement"
           }
         }
       };
@@ -252,20 +253,20 @@ describe("msrest", function () {
 
     it("should correctly serialize an array of array of primitives", function (done) {
       let mapper: msRest.SequenceMapper = {
-        required: false,
-        serializedName: "Sequence",
-        type: {
-          name: "Sequence",
-          element: {
-            required: true,
-            serializedName: "sequenceElement",
-            type: {
-              name: "Sequence",
-              element: {
-                required: true,
-                serializedName: "sequenceElement",
-                type: {
-                  name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "Sequence",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: true,
+            [K.serializedName]: "sequenceElement",
+            [K.type]: {
+              [K.name]: "Sequence",
+              [K.element]: {
+                [K.required]: true,
+                [K.serializedName]: "sequenceElement",
+                [K.type]: {
+                  [K.name]: "Number"
                 }
               }
             }
@@ -280,16 +281,16 @@ describe("msrest", function () {
 
     it('should correctly serialize an array of array of object types', function (done) {
       const mapper = {
-        serializedName: 'arrayObj',
-        required: true,
-        type: {
-          name: 'Sequence',
-          element: {
-            type : {
-              name: 'Sequence',
-              element: {
-                type: {
-                  name: 'Object'
+        [K.serializedName]: 'arrayObj',
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: 'Sequence',
+          [K.element]: {
+            [K.type]: {
+              [K.name]: 'Sequence',
+              [K.element]: {
+                [K.type]: {
+                  [K.name]: 'Object'
                 }
               }
             }
@@ -297,24 +298,24 @@ describe("msrest", function () {
         }
       };
       var array = [[1], ['2'], [1, '2', {}, true, []]];
-      var serializedArray = Serializer.serialize(mapper, array, mapper.serializedName);
+      var serializedArray = Serializer.serialize(mapper, array, mapper[K.serializedName]);
       assert.deepEqual(array, serializedArray);
       done();
     });
 
     it('should fail while serializing an array of array of "object" types when a null value is provided', function (done) {
       const mapper = {
-        serializedName: 'arrayObj',
-        required: true,
-        type: {
-          name: 'Sequence',
-          element: {
-            type : {
-              name: 'Sequence',
-              element: {
-                required: true,
-                type: {
-                  name: 'Object'
+        [K.serializedName]: 'arrayObj',
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: 'Sequence',
+          [K.element]: {
+            [K.type]: {
+              [K.name]: 'Sequence',
+              [K.element]: {
+                [K.required]: true,
+                [K.type]: {
+                  [K.name]: 'Object'
                 }
               }
             }
@@ -323,7 +324,7 @@ describe("msrest", function () {
       };
       var array = [[1], ['2'], [null], [1, '2', {}, true, []]];
       try {
-        Serializer.serialize(mapper, array, mapper.serializedName);
+        Serializer.serialize(mapper, array, mapper[K.serializedName]);
       } catch (err) {
         assert.equal(err.message, 'arrayObj cannot be null or undefined.');
       }
@@ -333,20 +334,20 @@ describe("msrest", function () {
 
     it("should correctly serialize an array of dictionary of primitives", function (done) {
       let mapper: msRest.SequenceMapper = {
-        required: false,
-        serializedName: "Sequence",
-        type: {
-          name: "Sequence",
-          element: {
-            required: true,
-            serializedName: "sequenceElement",
-            type: {
-              name: "Dictionary",
-              value: {
-                required: true,
-                serializedName: "valueElement",
-                type: {
-                  name: "Boolean"
+        [K.required]: false,
+        [K.serializedName]: "Sequence",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: true,
+            [K.serializedName]: "sequenceElement",
+            [K.type]: {
+              [K.name]: "Dictionary",
+              [K.value]: {
+                [K.required]: true,
+                [K.serializedName]: "valueElement",
+                [K.type]: {
+                  [K.name]: "Boolean"
                 }
               }
             }
@@ -361,15 +362,15 @@ describe("msrest", function () {
 
     it("should correctly serialize a dictionary of primitives", function (done) {
       let mapper: msRest.DictionaryMapper = {
-        required: false,
-        serializedName: "Dictionary",
-        type: {
-          name: "Dictionary",
-          value: {
-            required: true,
-            serializedName: "valueElement",
-            type: {
-              name: "String"
+        [K.required]: false,
+        [K.serializedName]: "Dictionary",
+        [K.type]: {
+          [K.name]: "Dictionary",
+          [K.value]: {
+            [K.required]: true,
+            [K.serializedName]: "valueElement",
+            [K.type]: {
+              [K.name]: "String"
             }
           }
         }
@@ -382,20 +383,20 @@ describe("msrest", function () {
 
     it("should correctly serialize a dictionary of array of primitives", function (done) {
       let mapper: msRest.DictionaryMapper = {
-        required: false,
-        serializedName: "Dictionary",
-        type: {
-          name: "Dictionary",
-          value: {
-            required: true,
-            serializedName: "valueElement",
-            type: {
-              name: "Sequence",
-              element: {
-                required: true,
-                serializedName: "sequenceElement",
-                type: {
-                  name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "Dictionary",
+        [K.type]: {
+          [K.name]: "Dictionary",
+          [K.value]: {
+            [K.required]: true,
+            [K.serializedName]: "valueElement",
+            [K.type]: {
+              [K.name]: "Sequence",
+              [K.element]: {
+                [K.required]: true,
+                [K.serializedName]: "sequenceElement",
+                [K.type]: {
+                  [K.name]: "Number"
                 }
               }
             }
@@ -410,20 +411,20 @@ describe("msrest", function () {
 
     it("should correctly serialize a dictionary of dictionary of primitives", function (done) {
       let mapper: msRest.DictionaryMapper = {
-        required: false,
-        serializedName: "Dictionary",
-        type: {
-          name: "Dictionary",
-          value: {
-            required: true,
-            serializedName: "valueElement",
-            type: {
-              name: "Dictionary",
-              value: {
-                required: true,
-                serializedName: "valueElement",
-                type: {
-                  name: "Boolean"
+        [K.required]: false,
+        [K.serializedName]: "Dictionary",
+        [K.type]: {
+          [K.name]: "Dictionary",
+          [K.value]: {
+            [K.required]: true,
+            [K.serializedName]: "valueElement",
+            [K.type]: {
+              [K.name]: "Dictionary",
+              [K.value]: {
+                [K.required]: true,
+                [K.serializedName]: "valueElement",
+                [K.type]: {
+                  [K.name]: "Boolean"
                 }
               }
             }
@@ -592,21 +593,21 @@ describe("msrest", function () {
 
   describe("deserialize", function () {
     it("should correctly deserialize a Date if the type is 'any'", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "any" }, required: false, serializedName: "any" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "any" }, [K.required]: false, [K.serializedName]: "any" };
       let d = new Date();
       let deserializedObject = Serializer.deserialize(mapper, d, "anyResponseBody");
       deserializedObject.should.equal(d);
       done();
     });
     it("should correctly deserialize an array if the type is 'any'", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "any" }, required: false, serializedName: "any" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "any" }, [K.required]: false, [K.serializedName]: "any" };
       let buf = [1, 2, 3];
       let deserializedObject = Serializer.deserialize(mapper, buf, "anyBody");
       deserializedObject.should.equal(buf);
       done();
     });
     it("should correctly deserialize a uuid", function (done) {
-      let mapper: msRest.Mapper = { type: { name: "Uuid" }, required: false, serializedName: "Uuid" };
+      let mapper: msRest.Mapper = { [K.type]: { [K.name]: "Uuid" }, [K.required]: false, [K.serializedName]: "Uuid" };
       let serializedObject = Serializer.deserialize(mapper, valid_uuid, "uuidBody");
       serializedObject.should.equal(valid_uuid);
       done();
@@ -689,17 +690,17 @@ describe("msrest", function () {
       let client = new TestClient("http://localhost:9090");
       let mapper = Mappers.ProductListResult;
       let responseBody = {
-        value: [
+        [K.value]: [
           {
             id: 101,
-            name: "TestProduct",
+            [K.name]: "TestProduct",
             properties: {
               provisioningState: "Succeeded"
             }
           },
           {
             id: 104,
-            name: "TestProduct1",
+            [K.name]: "TestProduct1",
             properties: {
               provisioningState: "Failed"
             }
@@ -727,17 +728,17 @@ describe("msrest", function () {
       let client = new TestClient("http://localhost:9090");
       let mapper = Mappers.ProductListResultNextLink;
       let responseBody = {
-        value: [
+        [K.value]: [
           {
             id: 101,
-            name: "TestProduct",
+            [K.name]: "TestProduct",
             properties: {
               provisioningState: "Succeeded"
             }
           },
           {
             id: 104,
-            name: "TestProduct1",
+            [K.name]: "TestProduct1",
             properties: {
               provisioningState: "Failed"
             }
@@ -850,16 +851,16 @@ describe("msrest", function () {
 
     it('should correctly deserialize an array of array of object types', function (done) {
       const mapper = {
-        serializedName: 'arrayObj',
-        required: true,
-        type: {
-          name: 'Sequence',
-          element: {
-            type : {
-              name: 'Sequence',
-              element: {
-                type: {
-                  name: 'Object'
+        [K.serializedName]: 'arrayObj',
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: 'Sequence',
+          [K.element]: {
+            [K.type]: {
+              [K.name]: 'Sequence',
+              [K.element]: {
+                [K.type]: {
+                  [K.name]: 'Object'
                 }
               }
             }
@@ -867,7 +868,7 @@ describe("msrest", function () {
         }
       };
       var array = [[1], ["2"], [1, "2", {}, true, []]];
-      var deserializedArray = Serializer.deserialize(mapper, array, mapper.serializedName);
+      var deserializedArray = Serializer.deserialize(mapper, array, mapper[K.serializedName]);
       assert.deepEqual(array, deserializedArray);
       done();
     });

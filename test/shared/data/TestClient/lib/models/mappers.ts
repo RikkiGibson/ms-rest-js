@@ -1,3 +1,5 @@
+import { MapperKey as K } from '../../../../../../lib/msRest';
+
 /*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
@@ -6,51 +8,51 @@
 let internalMappers: any = {};
 
 internalMappers.Cat = {
-  required: false,
-  serializedName: "cat",
-  type: {
-    name: "Composite",
-    className: "Cat",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "cat",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "Cat",
+    [K.modelProperties]: {
       id: {
-        required: false,
-        serializedName: "id",
-        type: {
-          name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "id",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       name: {
-        required: false,
-        serializedName: "name",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "name",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
-      pettype: {
-        required: true,
-        serializedName: "pet\\.type",
-        type: {
-          name: "String"
+      petName: {
+        [K.required]: true,
+        [K.serializedName]: "pet\\.type",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       color: {
-        required: false,
-        serializedName: "color",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "color",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       hates: {
-        required: false,
-        serializedName: "hates",
-        type: {
-          name: "Sequence",
-          element: {
-            required: false,
-            serializedName: "DogElementType",
-            type: {
-              name: "Composite",
-              className: "Dog"
+        [K.required]: false,
+        [K.serializedName]: "hates",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: false,
+            [K.serializedName]: "DogElementType",
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.className]: "Dog"
             }
           }
         }
@@ -59,132 +61,132 @@ internalMappers.Cat = {
   }
 };
 internalMappers.Dog = {
-  required: false,
-  serializedName: "dog",
-  type: {
-    name: "Composite",
-    className: "Dog",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "dog",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "Dog",
+    [K.modelProperties]: {
       id: {
-        required: false,
-        serializedName: "id",
-        type: {
-          name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "id",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       name: {
-        required: false,
-        serializedName: "name",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "name",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
-      pettype: {
-        required: true,
-        serializedName: "pet\\.type",
-        type: {
-          name: "String"
+      type: {
+        [K.required]: true,
+        [K.serializedName]: "pet\\.type",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       food: {
-        required: false,
-        serializedName: "food",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "food",
+        [K.type]: {
+          [K.name]: "String"
         }
       }
     }
   }
 };
 internalMappers.Fish = {
-  required: false,
-  serializedName: "Fish",
-  type: {
-    name: "Composite",
-    polymorphicDiscriminator: {
-      serializedName: "fish.type",
-      clientName: "fishtype"
+  [K.required]: false,
+  [K.serializedName]: "Fish",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.polymorphicDiscriminator]: {
+      [K.serializedName]: "fish.type",
+      [K.clientName]: "fishtype"
     },
-    uberParent: "Fish",
-    className: "Fish",
-    modelProperties: {
+    [K.uberParent]: "Fish",
+    [K.className]: "Fish",
+    [K.modelProperties]: {
       species: {
-        required: false,
-        serializedName: "species",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "species",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       length: {
-        required: true,
-        serializedName: "length",
-        type: {
-          name: "Number"
+        [K.required]: true,
+        [K.serializedName]: "length",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       siblings: {
-        required: false,
-        serializedName: "siblings",
-        type: {
-          name: "Sequence",
-          element: {
-            required: false,
-            serializedName: "FishElementType",
-            type: {
-              name: "Composite",
-              polymorphicDiscriminator: {
-                serializedName: "fish.type",
-                clientName: "fishtype"
+        [K.required]: false,
+        [K.serializedName]: "siblings",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: false,
+            [K.serializedName]: "FishElementType",
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.polymorphicDiscriminator]: {
+                [K.serializedName]: "fish.type",
+                [K.clientName]: "fishtype"
               },
-              uberParent: "Fish",
-              className: "Fish"
+              [K.uberParent]: "Fish",
+              [K.className]: "Fish"
             }
           }
         }
       },
       fishtype: {
-        required: true,
-        serializedName: "fish\\.type",
-        type: {
-          name: "String"
+        [K.required]: true,
+        [K.serializedName]: "fish\\.type",
+        [K.type]: {
+          [K.name]: "String"
         }
       }
     }
   }
 };
 internalMappers.Invoice = {
-  required: false,
-  serializedName: "Invoice",
-  type: {
-    name: "Composite",
-    className: "Invoice",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "Invoice",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "Invoice",
+    [K.modelProperties]: {
       invId: {
-        serializedName: "invoiceId",
-        required: true,
-        type: {
-          name: "Number"
+        [K.serializedName]: "invoiceId",
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       invDate: {
-        serializedName: "invDate",
-        required: false,
-        type: {
-          name: "Date"
+        [K.serializedName]: "invDate",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Date"
         }
       },
       invProducts: {
-        serializedName: "invProducts",
-        required: false,
-        type: {
-          name: "Sequence",
-          element: {
-            type: {
-              name: "Dictionary",
-              value: {
-                type: {
-                  name: "Composite",
-                  className: "Product"
+        [K.serializedName]: "invProducts",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.type]: {
+              [K.name]: "Dictionary",
+              [K.value]: {
+                [K.type]: {
+                  [K.name]: "Composite",
+                  [K.className]: "Product"
                 }
               }
             }
@@ -195,71 +197,71 @@ internalMappers.Invoice = {
   }
 };
 internalMappers.Pet = {
-  required: false,
-  serializedName: "pet",
-  type: {
-    name: "Composite",
-    className: "Pet",
-    polymorphicDiscriminator: "pet.type",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "pet",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "Pet",
+    [K.polymorphicDiscriminator]: "pet.type",
+    [K.modelProperties]: {
       id: {
-        required: false,
-        serializedName: "id",
-        type: {
-          name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "id",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       name: {
-        required: false,
-        serializedName: "name",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "name",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       pettype: {
-        required: true,
-        serializedName: "pet\\.type",
-        type: {
-          name: "String"
+        [K.required]: true,
+        [K.serializedName]: "pet\\.type",
+        [K.type]: {
+          [K.name]: "String"
         }
       }
     }
   }
 };
 internalMappers.PetGallery = {
-  required: false,
-  serializedName: "PetGallery",
-  type: {
-    name: "Composite",
-    className: "PetGallery",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "PetGallery",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "PetGallery",
+    [K.modelProperties]: {
       id: {
-        required: false,
-        serializedName: "id",
-        type: {
-          name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "id",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       name: {
-        required: false,
-        serializedName: "name",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "name",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       pets: {
-        required: false,
-        serializedName: "pets",
-        type: {
-          name: "Sequence",
-          element: {
-            required: false,
-            serializedName: "petElementType",
-            type: {
-              name: "Composite",
-              polymorphicDiscriminator: "pet.type",
-              uberParent: "Pet",
-              className: "Pet"
+        [K.required]: false,
+        [K.serializedName]: "pets",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: false,
+            [K.serializedName]: "petElementType",
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.polymorphicDiscriminator]: "pet.type",
+              [K.uberParent]: "Pet",
+              [K.className]: "Pet"
             }
           }
         }
@@ -268,73 +270,73 @@ internalMappers.PetGallery = {
   }
 };
 internalMappers.Product = {
-  required: false,
-  serializedName: "Product",
-  type: {
-    name: "Composite",
-    className: "Product",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "Product",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "Product",
+    [K.modelProperties]: {
       id: {
-        serializedName: "id",
+        [K.serializedName]: "id",
         constraints: {
 
         },
-        required: true,
-        type: {
-          name: "Number"
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       name: {
-        serializedName: "name",
-        required: true,
-        type: {
-          name: "String"
+        [K.serializedName]: "name",
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       provisioningState: {
-        serializedName: "properties.provisioningState",
-        required: false,
-        type: {
-          name: "Enum",
-          allowedValues: ["Creating", "Failed", "Succeeded"]
+        [K.serializedName]: "properties.provisioningState",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Enum",
+          [K.allowedValues]: ["Creating", "Failed", "Succeeded"]
         }
       },
       tags: {
-        serializedName: "tags",
-        required: false,
-        type: {
-          name: "Dictionary",
-          value: {
-            type: {
-              name: "String"
+        [K.serializedName]: "tags",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Dictionary",
+          [K.value]: {
+            [K.type]: {
+              [K.name]: "String"
             }
           }
         }
       },
       dispatchTime: {
-        serializedName: "dispatchTime",
-        required: false,
-        type: {
-          name: "DateTime"
+        [K.serializedName]: "dispatchTime",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "DateTime"
         }
       },
       invoiceInfo: {
-        serializedName: "invoiceInfo",
-        required: false,
-        type: {
-          name: "Composite",
-          className: "Invoice"
+        [K.serializedName]: "invoiceInfo",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Composite",
+          [K.className]: "Invoice"
         }
       },
       subProducts: {
-        serializedName: "subProducts",
-        required: false,
-        type: {
-          name: "Sequence",
-          element: {
-            type: {
-              name: "Composite",
-              className: "SubProduct"
+        [K.serializedName]: "subProducts",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.className]: "SubProduct"
             }
           }
         }
@@ -343,21 +345,21 @@ internalMappers.Product = {
   }
 };
 internalMappers.ProductListResult = {
-  required: false,
-  serializedName: "ProductListResult",
-  type: {
-    name: "Composite",
-    className: "ProductListResult",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "ProductListResult",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "ProductListResult",
+    [K.modelProperties]: {
       value: {
-        serializedName: "",
-        required: false,
-        type: {
-          name: "Sequence",
-          element: {
-            type: {
-              name: "Composite",
-              className: "Product"
+        [K.serializedName]: "",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.className]: "Product"
             }
           }
         }
@@ -366,224 +368,224 @@ internalMappers.ProductListResult = {
   }
 };
 internalMappers.ProductListResultNextLink = {
-  required: false,
-  serializedName: "ProductListResultNextLink",
-  type: {
-    name: "Composite",
-    className: "ProductListResultNextLink",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "ProductListResultNextLink",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "ProductListResultNextLink",
+    [K.modelProperties]: {
       value: {
-        serializedName: "",
-        required: false,
-        type: {
-          name: "Sequence",
-          element: {
-            type: {
-              name: "Composite",
-              className: "Product"
+        [K.serializedName]: "",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.className]: "Product"
             }
           }
         }
       },
       nextLink: {
-        serializedName: "nextLink",
-        required: false,
-        type: {
-          name: "String"
+        [K.serializedName]: "nextLink",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "String"
         }
       }
     }
   }
 };
 internalMappers.SawShark = {
-  required: false,
-  serializedName: "sawshark",
-  type: {
-    name: "Composite",
-    polymorphicDiscriminator: {
-      serializedName: 'fish.type',
-      clientName: 'fishtype'
+  [K.required]: false,
+  [K.serializedName]: "sawshark",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.polymorphicDiscriminator]: {
+      [K.serializedName]: 'fish.type',
+      [K.clientName]: 'fishtype'
     },
-    uberParent: 'Fish',
-    className: "Sawshark",
-    modelProperties: {
+    [K.uberParent]: 'Fish',
+    [K.className]: "Sawshark",
+    [K.modelProperties]: {
       species: {
-        required: false,
-        serializedName: "species",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "species",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       length: {
-        required: true,
-        serializedName: "length",
-        type: {
-          name: "Number"
+        [K.required]: true,
+        [K.serializedName]: "length",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       siblings: {
-        required: false,
-        serializedName: "siblings",
-        type: {
-          name: "Sequence",
-          element: {
-            required: false,
-            serializedName: "FishElementType",
-            type: {
-              name: "Composite",
-              polymorphicDiscriminator: {
-                serializedName: "fish.type",
-                clientName: "fishtype"
+        [K.required]: false,
+        [K.serializedName]: "siblings",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: false,
+            [K.serializedName]: "FishElementType",
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.polymorphicDiscriminator]: {
+                [K.serializedName]: "fish.type",
+                [K.clientName]: "fishtype"
               },
-              uberParent: "Fish",
-              className: "Fish"
+              [K.uberParent]: "Fish",
+              [K.className]: "Fish"
             }
           }
         }
       },
       fishtype: {
-        required: true,
-        serializedName: "fish\\.type",
-        type: {
-          name: "String"
+        [K.required]: true,
+        [K.serializedName]: "fish\\.type",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       age: {
-        required: false,
-        serializedName: "age",
-        type: {
-          name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "age",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       birthday: {
-        required: true,
-        serializedName: "birthday",
-        type: {
-          name: "DateTime"
+        [K.required]: true,
+        [K.serializedName]: "birthday",
+        [K.type]: {
+          [K.name]: "DateTime"
         }
       },
       picture: {
-        required: false,
-        serializedName: "picture",
-        type: {
-          name: "ByteArray"
+        [K.required]: false,
+        [K.serializedName]: "picture",
+        [K.type]: {
+          [K.name]: "ByteArray"
         }
       }
     }
   }
 };
 internalMappers.Shark = {
-  required: false,
-  serializedName: "shark",
-  type: {
-    name: "Composite",
-    polymorphicDiscriminator: {
-      serializedName: 'fish.type',
-      clientName: 'fishtype'
+  [K.required]: false,
+  [K.serializedName]: "shark",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.polymorphicDiscriminator]: {
+      [K.serializedName]: 'fish.type',
+      [K.clientName]: 'fishtype'
     },
-    uberParent: 'Fish',
-    className: "Shark",
-    modelProperties: {
+    [K.uberParent]: 'Fish',
+    [K.className]: "Shark",
+    [K.modelProperties]: {
       species: {
-        required: false,
-        serializedName: "species",
-        type: {
-          name: "String"
+        [K.required]: false,
+        [K.serializedName]: "species",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       length: {
-        required: true,
-        serializedName: "length",
-        type: {
-          name: "Number"
+        [K.required]: true,
+        [K.serializedName]: "length",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       siblings: {
-        required: false,
-        serializedName: "siblings",
-        type: {
-          name: "Sequence",
-          element: {
-            required: false,
-            serializedName: "FishElementType",
-            type: {
-              name: "Composite",
-              polymorphicDiscriminator: {
-                serializedName: "fish.type",
-                clientName: "fishtype"
+        [K.required]: false,
+        [K.serializedName]: "siblings",
+        [K.type]: {
+          [K.name]: "Sequence",
+          [K.element]: {
+            [K.required]: false,
+            [K.serializedName]: "FishElementType",
+            [K.type]: {
+              [K.name]: "Composite",
+              [K.polymorphicDiscriminator]: {
+                [K.serializedName]: "fish.type",
+                [K.clientName]: "fishtype"
               },
-              uberParent: "Fish",
-              className: "Fish"
+              [K.uberParent]: "Fish",
+              [K.className]: "Fish"
             }
           }
         }
       },
       fishtype: {
-        required: true,
-        serializedName: "fish\\.type",
-        type: {
-          name: "String"
+        [K.required]: true,
+        [K.serializedName]: "fish\\.type",
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       age: {
-        required: false,
-        serializedName: "age",
-        type: {
-          name: "Number"
+        [K.required]: false,
+        [K.serializedName]: "age",
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       birthday: {
-        required: true,
-        serializedName: "birthday",
-        type: {
-          name: "DateTime"
+        [K.required]: true,
+        [K.serializedName]: "birthday",
+        [K.type]: {
+          [K.name]: "DateTime"
         }
       }
     }
   }
 };
 internalMappers.SubProduct = {
-  required: false,
-  serializedName: "SubProduct",
-  type: {
-    name: "Composite",
-    className: "SubProduct",
-    modelProperties: {
+  [K.required]: false,
+  [K.serializedName]: "SubProduct",
+  [K.type]: {
+    [K.name]: "Composite",
+    [K.className]: "SubProduct",
+    [K.modelProperties]: {
       subId: {
-        serializedName: "subId",
-        required: true,
-        type: {
-          name: "Number"
+        [K.serializedName]: "subId",
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: "Number"
         }
       },
       subName: {
-        serializedName: "subName",
-        required: true,
-        type: {
-          name: "String"
+        [K.serializedName]: "subName",
+        [K.required]: true,
+        [K.type]: {
+          [K.name]: "String"
         }
       },
       provisioningState: {
-        serializedName: "provisioningState",
-        required: false,
-        type: {
-          name: "Enum",
-          allowedValues: ["Creating", "Failed", "Succeeded"]
+        [K.serializedName]: "provisioningState",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Enum",
+          [K.allowedValues]: ["Creating", "Failed", "Succeeded"]
         }
       },
       makeTime: {
-        serializedName: "makeTime",
-        required: false,
-        type: {
-          name: "DateTime"
+        [K.serializedName]: "makeTime",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "DateTime"
         }
       },
       invoiceInfo: {
-        serializedName: "invoiceInfo",
-        required: false,
-        type: {
-          name: "Composite",
-          className: "Invoice"
+        [K.serializedName]: "invoiceInfo",
+        [K.required]: false,
+        [K.type]: {
+          [K.name]: "Composite",
+          [K.className]: "Invoice"
         }
       }
     }

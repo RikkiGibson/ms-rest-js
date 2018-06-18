@@ -5,6 +5,7 @@ import { HttpOperationResponse } from "../httpOperationResponse";
 import { getPathStringFromParameter } from "../operationParameter";
 import { OperationSpec } from "../operationSpec";
 import { Mapper, MapperType } from "../serializer";
+import { MapperKey as K } from "../mapperKey";
 import * as utils from "../util/utils";
 import { WebResource } from "../webResource";
 import { BaseRequestPolicy, RequestPolicy, RequestPolicyCreator, RequestPolicyOptions } from "./requestPolicy";
@@ -49,22 +50,24 @@ export class SerializationPolicy extends BaseRequestPolicy {
       const bodyMapper: Mapper | undefined = operationSpec.requestBody.mapper;
       if (bodyMapper) {
         try {
-          if (request.body != undefined || bodyMapper.required) {
+          if (request.body != undefined || bodyMapper[K.required]) {
             const requestBodyParameterPathString: string = getPathStringFromParameter(operationSpec.requestBody);
             request.body = operationSpec.serializer.serialize(bodyMapper, request.body, requestBodyParameterPathString);
             if (operationSpec.isXML) {
-              if (bodyMapper.type.name === MapperType.Sequence) {
-                request.body = utils.stringifyXML(utils.prepareXMLRootList(request.body, bodyMapper.xmlElementName || bodyMapper.xmlName || bodyMapper.serializedName), { rootName: bodyMapper.xmlName || bodyMapper.serializedName });
+              if (bodyMapper[K.type][K.name] === MapperType.Sequence) {
+                request.body = utils.stringifyXML(
+                  utils.prepareXMLRootList(request.body, bodyMapper[K.xmlElementName] || bodyMapper[K.xmlName] || bodyMapper[K.serializedName]),
+                  { rootName: bodyMapper[K.xmlName] || bodyMapper[K.serializedName] });
               }
               else {
-                request.body = utils.stringifyXML(request.body, { rootName: bodyMapper.xmlName || bodyMapper.serializedName });
+                request.body = utils.stringifyXML(request.body, { rootName: bodyMapper[K.xmlName] || bodyMapper[K.serializedName] });
               }
-            } else if (bodyMapper.type.name !== MapperType.Stream) {
+            } else if (bodyMapper[K.type][K.name] !== MapperType.Stream) {
               request.body = JSON.stringify(request.body);
             }
           }
         } catch (error) {
-          throw new Error(`Error "${error.message}" occurred in serializing the payload - ${JSON.stringify(bodyMapper.serializedName, undefined, "  ")}.`);
+          throw new Error(`Error "${error.message}" occurred in serializing the payload - ${JSON.stringify(bodyMapper[K.serializedName], undefined, "  ")}.`);
         }
       }
     }

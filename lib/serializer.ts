@@ -4,58 +4,61 @@
 import * as utils from "./util/utils";
 import * as base64 from "./util/base64";
 
+import { MapperKey as K } from "./mapperKey";
+
 export class Serializer {
   constructor(public readonly modelMappers?: { [key: string]: any }, public readonly isXML?: boolean) { }
 
   validateConstraints(mapper: Mapper, value: any, objectName: string): void {
-    if (mapper.constraints && (value !== null || value !== undefined)) {
-      for (const constraintType of Object.keys(mapper.constraints)) {
+    const constraints = mapper[K.constraints];
+    if (constraints && value != undefined) {
+      for (const constraintType of Object.keys(constraints)) {
         if (constraintType.match(/^ExclusiveMaximum$/ig) !== null) {
-          if (value >= ((mapper.constraints as MapperConstraints).ExclusiveMaximum as number)) {
-            throw new Error(`"${objectName}" with value "${value}" should satify the constraint "ExclusiveMaximum": ${((mapper.constraints as MapperConstraints).ExclusiveMaximum as number)}.`);
+          if (value >= (constraints.ExclusiveMaximum as number)) {
+            throw new Error(`"${objectName}" with value "${value}" should satify the constraint "ExclusiveMaximum": ${(constraints.ExclusiveMaximum as number)}.`);
           }
         } else if (constraintType.match(/^ExclusiveMinimum$/ig) !== null) {
-          if (value <= ((mapper.constraints as MapperConstraints).ExclusiveMinimum as number)) {
-            throw new Error(`${objectName} " with value "${value} " should satify the constraint "ExclusiveMinimum": ${((mapper.constraints as MapperConstraints).ExclusiveMinimum as number)}.`);
+          if (value <= (constraints.ExclusiveMinimum as number)) {
+            throw new Error(`${objectName} " with value "${value} " should satify the constraint "ExclusiveMinimum": ${(constraints.ExclusiveMinimum as number)}.`);
           }
         } else if (constraintType.match(/^InclusiveMaximum$/ig) !== null) {
-          if (value > ((mapper.constraints as MapperConstraints).InclusiveMaximum as number)) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "InclusiveMaximum": ${((mapper.constraints as MapperConstraints).InclusiveMaximum as number)}.`);
+          if (value > (constraints.InclusiveMaximum as number)) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "InclusiveMaximum": ${(constraints.InclusiveMaximum as number)}.`);
           }
         } else if (constraintType.match(/^InclusiveMinimum$/ig) !== null) {
-          if (value < ((mapper.constraints as MapperConstraints).InclusiveMinimum as number)) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "InclusiveMinimum": ${((mapper.constraints as MapperConstraints).InclusiveMinimum as number)}.`);
+          if (value < (constraints.InclusiveMinimum as number)) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "InclusiveMinimum": ${(constraints.InclusiveMinimum as number)}.`);
           }
         } else if (constraintType.match(/^MaxItems$/ig) !== null) {
-          if (value.length > ((mapper.constraints as MapperConstraints).MaxItems as number)) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MaxItems": ${((mapper.constraints as MapperConstraints).MaxItems as number)}.`);
+          if (value.length > (constraints.MaxItems as number)) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MaxItems": ${(constraints.MaxItems as number)}.`);
           }
         } else if (constraintType.match(/^MaxLength$/ig) !== null) {
-          if (value.length > ((mapper.constraints as MapperConstraints).MaxLength as number)) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MaxLength": ${((mapper.constraints as MapperConstraints).MaxLength as number)}.`);
+          if (value.length > (constraints.MaxLength as number)) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MaxLength": ${(constraints.MaxLength as number)}.`);
           }
         } else if (constraintType.match(/^MinItems$/ig) !== null) {
-          if (value.length < ((mapper.constraints as MapperConstraints).MinItems as number)) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MinItems": ${((mapper.constraints as MapperConstraints).MinItems as number)}.`);
+          if (value.length < (constraints.MinItems as number)) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MinItems": ${(constraints.MinItems as number)}.`);
           }
         } else if (constraintType.match(/^MinLength$/ig) !== null) {
-          if (value.length < ((mapper.constraints as MapperConstraints).MinLength as number)) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MinLength": ${((mapper.constraints as MapperConstraints).MinLength as number)}.`);
+          if (value.length < (constraints.MinLength as number)) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MinLength": ${(constraints.MinLength as number)}.`);
           }
         } else if (constraintType.match(/^MultipleOf$/ig) !== null) {
-          if (value % ((mapper.constraints as MapperConstraints).MultipleOf as number) !== 0) {
-            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MultipleOf": ${((mapper.constraints as MapperConstraints).MultipleOf as number)}.`);
+          if (value % (constraints.MultipleOf as number) !== 0) {
+            throw new Error(`${objectName}" with value "${value}" should satify the constraint "MultipleOf": ${(constraints.MultipleOf as number)}.`);
           }
         } else if (constraintType.match(/^Pattern$/ig) !== null) {
-          const regexp: RegExp = (mapper.constraints as MapperConstraints).Pattern!;
+          const regexp: RegExp = constraints.Pattern!;
           const match: any = value.match(regexp);
           if (match === null) {
             throw new Error(`${objectName}" with value "${value}" should satify the constraint "Pattern": ${regexp}.`);
           }
         } else if (constraintType.match(/^UniqueItems/ig) !== null) {
-          if (((mapper.constraints as MapperConstraints).UniqueItems as boolean)) {
+          if ((constraints.UniqueItems as boolean)) {
             if (value.length !== value.filter((item: any, i: number, ar: Array<any>) => { { return ar.indexOf(item) === i; } }).length) {
-              throw new Error(`${objectName}" with value "${value}" should satify the constraint "UniqueItems": ${((mapper.constraints as MapperConstraints).UniqueItems as boolean)}`);
+              throw new Error(`${objectName}" with value "${value}" should satify the constraint "UniqueItems": ${(constraints.UniqueItems as boolean)}`);
             }
           }
         }
@@ -76,9 +79,9 @@ export class Serializer {
    */
   serialize(mapper: Mapper, object: any, objectName?: string): any {
     let payload: any = {};
-    const mapperType = mapper.type.name as string;
+    const mapperType = mapper[K.type][K.name] as string;
     if (!objectName) {
-      objectName = mapper.serializedName;
+      objectName = mapper[K.serializedName];
     }
     if (mapperType.match(/^Sequence$/ig) !== null) {
       payload = [];
@@ -86,12 +89,12 @@ export class Serializer {
 
     if (object == undefined) {
       // Throw if required and object is null or undefined
-      if (mapper.required && !mapper.isConstant) {
+      if (mapper[K.required] && !mapper[K.isConstant]) {
         throw new Error(`${objectName} cannot be null or undefined.`);
       }
       // Set Defaults
-      if (mapper.defaultValue != undefined || mapper.isConstant) {
-        object = mapper.defaultValue;
+      if (mapper[K.defaultValue] != undefined || mapper[K.isConstant]) {
+        object = mapper[K.defaultValue];
       }
     }
 
@@ -106,7 +109,7 @@ export class Serializer {
         payload = serializeBasicTypes(mapperType, objectName, object);
       } else if (mapperType.match(/^Enum$/ig) !== null) {
         const enumMapper: EnumMapper = mapper as EnumMapper;
-        payload = serializeEnumType(objectName, enumMapper.type.allowedValues, object);
+        payload = serializeEnumType(objectName, enumMapper[K.type][K.allowedValues], object);
       } else if (mapperType.match(/^(Date|DateTime|TimeSpan|DateTimeRfc1123|UnixTime)$/ig) !== null) {
         payload = serializeDateTypes(mapperType, object, objectName);
       } else if (mapperType.match(/^ByteArray$/ig) !== null) {
@@ -137,7 +140,7 @@ export class Serializer {
    */
   deserialize(mapper: Mapper, responseBody: any, objectName: string): any {
     if (responseBody == undefined) {
-      if (this.isXML && mapper.type.name === "Sequence" && !mapper.xmlIsWrapped) {
+      if (this.isXML && mapper[K.type][K.name] === "Sequence" && !mapper[K.xmlIsWrapped]) {
         // Edge case for empty XML non-wrapped lists. xml2js can't distinguish
         // between the list being empty versus being missing,
         // so let's do the more user-friendly thing and return an empty list.
@@ -149,9 +152,9 @@ export class Serializer {
     }
 
     let payload: any;
-    const mapperType = mapper.type.name;
+    const mapperType = mapper[K.type][K.name];
     if (!objectName) {
-      objectName = mapper.serializedName;
+      objectName = mapper[K.serializedName];
     }
 
     if (mapperType.match(/^Number$/ig) !== null) {
@@ -185,8 +188,8 @@ export class Serializer {
       payload = deserializeCompositeType(this, mapper as CompositeMapper, responseBody, objectName);
     }
 
-    if (mapper.isConstant) {
-      payload = mapper.defaultValue;
+    if (mapper[K.isConstant]) {
+      payload = mapper[K.defaultValue];
     }
 
     return payload;
@@ -372,13 +375,13 @@ function serializeSequenceType(serializer: Serializer, mapper: SequenceMapper, o
   if (!Array.isArray(object)) {
     throw new Error(`${objectName} must be of type Array.`);
   }
-  if (!mapper.type.element || typeof mapper.type.element !== "object") {
+  if (!mapper[K.type][K.element] || typeof mapper[K.type][K.element] !== "object") {
     throw new Error(`element" metadata for an Array must be defined in the ` +
       `mapper and it must of type "object" in ${objectName}.`);
   }
   const tempArray = [];
   for (let i = 0; i < object.length; i++) {
-    tempArray[i] = serializer.serialize(mapper.type.element, object[i], objectName);
+    tempArray[i] = serializer.serialize(mapper[K.type][K.element], object[i], objectName);
   }
   return tempArray;
 }
@@ -388,14 +391,14 @@ function serializeDictionaryType(serializer: Serializer, mapper: DictionaryMappe
   if (typeof object !== "object") {
     throw new Error(`${objectName} must be of type object.`);
   }
-  if (!mapper.type.value || typeof mapper.type.value !== "object") {
+  if (!mapper[K.type][K.value] || typeof mapper[K.type][K.value] !== "object") {
     throw new Error(`"value" metadata for a Dictionary must be defined in the ` +
       `mapper and it must of type "object" in ${objectName}.`);
   }
   const tempDictionary: { [key: string]: any } = {};
   for (const key in object) {
     if (object.hasOwnProperty(key)) {
-      tempDictionary[key] = serializer.serialize(mapper.type.value, object[key], objectName);
+      tempDictionary[key] = serializer.serialize(mapper[K.type][K.value], object[key], objectName);
     }
   }
   return tempDictionary;
@@ -403,36 +406,36 @@ function serializeDictionaryType(serializer: Serializer, mapper: DictionaryMappe
 
 function serializeCompositeType(serializer: Serializer, mapper: CompositeMapper, object: any, objectName: string) {
   // check for polymorphic discriminator
-  if (mapper.type.polymorphicDiscriminator) {
+  if (mapper[K.type][K.polymorphicDiscriminator]) {
     mapper = getPolymorphicMapper(serializer, mapper, object, objectName, "serialize");
   }
 
   const payload: any = {};
   let modelMapper: CompositeMapper = {
-    required: false,
-    serializedName: "serializedName",
-    type: {
-      name: "Composite",
-      className: "className",
-      modelProperties: {}
+    [K.required]: false,
+    [K.serializedName]: "serializedName",
+    [K.type]: {
+      [K.name]: "Composite",
+      [K.className]: "className",
+      [K.modelProperties]: {}
     }
   };
   if (object !== null && object !== undefined) {
-    let modelProps = mapper.type.modelProperties;
+    let modelProps = mapper[K.type][K.modelProperties];
     if (!modelProps) {
-      if (!mapper.type.className) {
+      if (!mapper[K.type][K.className]) {
         throw new Error(`Class name for model "${objectName}" is not provided in the mapper "${JSON.stringify(mapper, undefined, 2)}".`);
       }
       // get the mapper if modelProperties of the CompositeType is not present and
       // then get the modelProperties from it.
-      modelMapper = (serializer.modelMappers as { [key: string]: any })[mapper.type.className];
+      modelMapper = (serializer.modelMappers as { [key: string]: any })[mapper[K.type][K.className]];
       if (!modelMapper) {
-        throw new Error(`mapper() cannot be null or undefined for model "${mapper.type.className}".`);
+        throw new Error(`mapper() cannot be null or undefined for model "${mapper[K.type][K.className]}".`);
       }
-      modelProps = modelMapper.type.modelProperties;
+      modelProps = modelMapper[K.type][K.modelProperties];
       if (!modelProps) {
         throw new Error(`modelProperties cannot be null or undefined in the ` +
-          `mapper "${JSON.stringify(modelMapper)}" of type "${mapper.type.className}" for object "${objectName}".`);
+          `mapper "${JSON.stringify(modelMapper)}" of type "${mapper[K.type][K.className]}" for object "${objectName}".`);
       }
     }
 
@@ -442,13 +445,13 @@ function serializeCompositeType(serializer: Serializer, mapper: CompositeMapper,
       let propName: string | undefined;
       let parentObject: any = payload;
       if (serializer.isXML) {
-        if (propertyMapper.xmlIsWrapped) {
-          propName = propertyMapper.xmlName;
+        if (propertyMapper[K.xmlIsWrapped]) {
+          propName = propertyMapper[K.xmlName];
         } else {
-          propName = propertyMapper.xmlElementName || propertyMapper.xmlName;
+          propName = propertyMapper[K.xmlElementName] || propertyMapper[K.xmlName];
         }
       } else {
-        const paths = splitSerializeName(propertyMapper.serializedName);
+        const paths = splitSerializeName(propertyMapper[K.serializedName]);
         propName = paths.pop();
 
         for (const pathName of paths) {
@@ -461,33 +464,33 @@ function serializeCompositeType(serializer: Serializer, mapper: CompositeMapper,
       }
 
       // make sure required properties of the CompositeType are present
-      if (propertyMapper.required && !propertyMapper.isConstant) {
+      if (propertyMapper[K.required] && !propertyMapper[K.isConstant]) {
         if (object[key] == undefined) {
           throw new Error(`${key}" cannot be null or undefined in "${objectName}".`);
         }
       }
       // make sure that readOnly properties are not sent on the wire
-      if (propertyMapper.readOnly) {
+      if (propertyMapper[K.readOnly]) {
         continue;
       }
       // serialize the property if it is present in the provided object instance
-      if (((parentObject !== null && parentObject !== undefined) && (propertyMapper.defaultValue !== null && propertyMapper.defaultValue !== undefined)) ||
+      if (((parentObject !== null && parentObject !== undefined) && (propertyMapper[K.defaultValue] !== null && propertyMapper[K.defaultValue] !== undefined)) ||
         (object[key] !== null && object[key] !== undefined)) {
-        const propertyObjectName = propertyMapper.serializedName !== ""
-          ? objectName + "." + propertyMapper.serializedName
+        const propertyObjectName = propertyMapper[K.serializedName] !== ""
+          ? objectName + "." + propertyMapper[K.serializedName]
           : objectName;
 
         const serializedValue = serializer.serialize(propertyMapper, object[key], propertyObjectName);
 
         if (propName !== null && propName !== undefined) {
-          if (propertyMapper.xmlIsAttribute) {
+          if (propertyMapper[K.xmlIsAttribute]) {
             // $ is the key attributes are kept under in xml2js.
             // This keeps things simple while preventing name collision
             // with names in user documents.
             parentObject.$ = parentObject.$ || {};
             parentObject.$[propName] = serializedValue;
-          } else if (propertyMapper.xmlIsWrapped) {
-            parentObject[propName] = { [propertyMapper.xmlElementName!]: serializedValue };
+          } else if (propertyMapper[K.xmlIsWrapped]) {
+            parentObject[propName] = { [propertyMapper[K.xmlElementName]!]: serializedValue };
           } else {
             parentObject[propName] = serializedValue;
           }
@@ -502,53 +505,53 @@ function serializeCompositeType(serializer: Serializer, mapper: CompositeMapper,
 function deserializeCompositeType(serializer: Serializer, mapper: CompositeMapper, responseBody: any, objectName: string): any {
   /*jshint validthis: true */
   // check for polymorphic discriminator
-  if (mapper.type.polymorphicDiscriminator) {
+  if (mapper[K.type][K.polymorphicDiscriminator]) {
     mapper = getPolymorphicMapper(serializer, mapper, responseBody, objectName, "deserialize");
   }
 
   let instance: { [key: string]: any } = {};
   let modelMapper: Mapper = {
-    required: false,
-    serializedName: "serializedName",
-    type: {
-      name: "Composite"
+    [K.required]: false,
+    [K.serializedName]: "serializedName",
+    [K.type]: {
+      [K.name]: "Composite"
     }
   };
   responseBody = responseBody || {};
-  let modelProps = mapper.type.modelProperties;
+  let modelProps = mapper[K.type][K.modelProperties];
   if (!modelProps) {
-    if (!mapper.type.className) {
+    if (!mapper[K.type][K.className]) {
       throw new Error(`Class name for model "${objectName}" is not provided in the mapper "${JSON.stringify(mapper)}"`);
     }
     // get the mapper if modelProperties of the CompositeType is not present and
     // then get the modelProperties from it.
-    modelMapper = (serializer.modelMappers as { [key: string]: any })[mapper.type.className];
+    modelMapper = (serializer.modelMappers as { [key: string]: any })[mapper[K.type][K.className]];
     if (!modelMapper) {
-      throw new Error(`mapper() cannot be null or undefined for model "${mapper.type.className}"`);
+      throw new Error(`mapper() cannot be null or undefined for model "${mapper[K.type][K.className]}"`);
     }
-    modelProps = (modelMapper as CompositeMapper).type.modelProperties;
+    modelProps = (modelMapper as CompositeMapper)[K.type][K.modelProperties];
     if (!modelProps) {
       throw new Error(`modelProperties cannot be null or undefined in the ` +
-        `mapper "${JSON.stringify(modelMapper)}" of type "${mapper.type.className}" for responseBody "${objectName}".`);
+        `mapper "${JSON.stringify(modelMapper)}" of type "${mapper[K.type][K.className]}" for responseBody "${objectName}".`);
     }
   }
 
   for (const key of Object.keys(modelProps)) {
     const propertyMapper = modelProps[key];
     let propertyObjectName = objectName;
-    if (propertyMapper.serializedName !== "") {
-      propertyObjectName = objectName + "." + propertyMapper.serializedName;
+    if (propertyMapper[K.serializedName] !== "") {
+      propertyObjectName = objectName + "." + propertyMapper[K.serializedName];
     }
 
     if (serializer.isXML) {
-      if (propertyMapper.xmlIsAttribute && responseBody.$) {
-        instance[key] = serializer.deserialize(propertyMapper, responseBody.$[propertyMapper.xmlName!], propertyObjectName);
+      if (propertyMapper[K.xmlIsAttribute] && responseBody.$) {
+        instance[key] = serializer.deserialize(propertyMapper, responseBody.$[propertyMapper[K.xmlName]!], propertyObjectName);
       } else {
-        const propertyName = propertyMapper.xmlElementName || propertyMapper.xmlName;
+        const propertyName = propertyMapper[K.xmlElementName] || propertyMapper[K.xmlName];
         let unwrappedProperty = responseBody[propertyName!];
-        if (propertyMapper.xmlIsWrapped) {
-          unwrappedProperty = responseBody[propertyMapper.xmlName!];
-          unwrappedProperty = unwrappedProperty && unwrappedProperty[propertyMapper.xmlElementName!];
+        if (propertyMapper[K.xmlIsWrapped]) {
+          unwrappedProperty = responseBody[propertyMapper[K.xmlName]!];
+          unwrappedProperty = unwrappedProperty && unwrappedProperty[propertyMapper[K.xmlElementName]!];
           if (unwrappedProperty === undefined) {
             // undefined means a wrapped list was empty
             unwrappedProperty = [];
@@ -557,7 +560,7 @@ function deserializeCompositeType(serializer: Serializer, mapper: CompositeMappe
         instance[key] = serializer.deserialize(propertyMapper, unwrappedProperty, propertyObjectName);
       }
     } else {
-      const paths = splitSerializeName(modelProps[key].serializedName);
+      const paths = splitSerializeName(modelProps[key][K.serializedName]);
       // deserialize the property if it is present in the provided responseBody instance
       let propertyInstance;
       let res = responseBody;
@@ -569,10 +572,10 @@ function deserializeCompositeType(serializer: Serializer, mapper: CompositeMappe
       propertyInstance = res;
       let serializedValue;
       // paging
-      if (Array.isArray(responseBody[key]) && modelProps[key].serializedName === "") {
+      if (Array.isArray(responseBody[key]) && modelProps[key][K.serializedName] === "") {
         propertyInstance = responseBody[key];
         instance = serializer.deserialize(propertyMapper, propertyInstance, propertyObjectName);
-      } else if (propertyInstance !== null && propertyInstance !== undefined) {
+      } else if (propertyInstance != undefined) {
         serializedValue = serializer.deserialize(propertyMapper, propertyInstance, propertyObjectName);
         instance[key] = serializedValue;
       }
@@ -583,7 +586,7 @@ function deserializeCompositeType(serializer: Serializer, mapper: CompositeMappe
 
 function deserializeDictionaryType(serializer: Serializer, mapper: DictionaryMapper, responseBody: any, objectName: string): any {
   /*jshint validthis: true */
-  if (!mapper.type.value || typeof mapper.type.value !== "object") {
+  if (!mapper[K.type][K.value] || typeof mapper[K.type][K.value] !== "object") {
     throw new Error(`"value" metadata for a Dictionary must be defined in the ` +
       `mapper and it must of type "object" in ${objectName}`);
   }
@@ -591,7 +594,7 @@ function deserializeDictionaryType(serializer: Serializer, mapper: DictionaryMap
     const tempDictionary: { [key: string]: any } = {};
     for (const key in responseBody) {
       if (responseBody.hasOwnProperty(key)) {
-        tempDictionary[key] = serializer.deserialize(mapper.type.value, responseBody[key], objectName);
+        tempDictionary[key] = serializer.deserialize(mapper[K.type][K.value], responseBody[key], objectName);
       }
     }
     return tempDictionary;
@@ -601,7 +604,7 @@ function deserializeDictionaryType(serializer: Serializer, mapper: DictionaryMap
 
 function deserializeSequenceType(serializer: Serializer, mapper: SequenceMapper, responseBody: any, objectName: string): any {
   /*jshint validthis: true */
-  if (!mapper.type.element || typeof mapper.type.element !== "object") {
+  if (!mapper[K.type][K.element] || typeof mapper[K.type][K.element] !== "object") {
     throw new Error(`element" metadata for an Array must be defined in the ` +
       `mapper and it must of type "object" in ${objectName}`);
   }
@@ -613,7 +616,7 @@ function deserializeSequenceType(serializer: Serializer, mapper: SequenceMapper,
 
     const tempArray = [];
     for (let i = 0; i < responseBody.length; i++) {
-      tempArray[i] = serializer.deserialize(mapper.type.element, responseBody[i], objectName);
+      tempArray[i] = serializer.deserialize(mapper[K.type][K.element], responseBody[i], objectName);
     }
     return tempArray;
   }
@@ -633,10 +636,10 @@ function getPolymorphicMapper(serializer: Serializer, mapper: CompositeMapper, o
   // for the model that needs to be serializes or deserialized.
   // We need this routing for backwards compatibility. This will absorb the breaking change in the mapper and allow new versions
   // of the runtime to work seamlessly with older version (>= 0.17.0-Nightly20161008) of Autorest generated node.js clients.
-  if (mapper.type.polymorphicDiscriminator) {
-    if (typeof mapper.type.polymorphicDiscriminator.valueOf() === "string") {
+  if (mapper[K.type][K.polymorphicDiscriminator]) {
+    if (typeof mapper[K.type][K.polymorphicDiscriminator] === "string") {
       return getPolymorphicMapperStringVersion(serializer, mapper, object, objectName);
-    } else if (mapper.type.polymorphicDiscriminator instanceof Object) {
+    } else if (mapper[K.type][K.polymorphicDiscriminator] instanceof Object) {
       return getPolymorphicMapperObjectVersion(serializer, mapper, object, objectName, mode);
     } else {
       throw new Error(`The polymorphicDiscriminator for "${objectName}" is neither a string nor an object.`);
@@ -651,13 +654,13 @@ function getPolymorphicMapperObjectVersion(serializer: Serializer, mapper: Compo
   // check for polymorphic discriminator
   let polymorphicPropertyName = "";
   if (mode === "serialize") {
-    polymorphicPropertyName = "clientName";
+    polymorphicPropertyName = K.clientName;
   } else if (mode === "deserialize") {
-    polymorphicPropertyName = "serializedName";
+    polymorphicPropertyName = K.serializedName;
   } else {
     throw new Error(`The given mode "${mode}" for getting the polymorphic mapper for "${objectName}" is inavlid.`);
   }
-  const discriminatorAsObject: PolymorphicDiscriminator = mapper.type.polymorphicDiscriminator as PolymorphicDiscriminator;
+  const discriminatorAsObject: PolymorphicDiscriminator = mapper[K.type][K.polymorphicDiscriminator] as PolymorphicDiscriminator;
 
   if (discriminatorAsObject &&
     discriminatorAsObject[polymorphicPropertyName] !== null &&
@@ -672,10 +675,10 @@ function getPolymorphicMapperObjectVersion(serializer: Serializer, mapper: Compo
       throw new Error(`No discriminator field "${discriminatorAsObject[polymorphicPropertyName]}" was found in "${objectName}".`);
     }
     let indexDiscriminator = undefined;
-    if (object[discriminatorAsObject[polymorphicPropertyName]] === mapper.type.uberParent) {
+    if (object[discriminatorAsObject[polymorphicPropertyName]] === mapper[K.type][K.uberParent]) {
       indexDiscriminator = object[discriminatorAsObject[polymorphicPropertyName]];
     } else {
-      indexDiscriminator = mapper.type.uberParent + "." + object[discriminatorAsObject[polymorphicPropertyName]];
+      indexDiscriminator = mapper[K.type][K.uberParent] + "." + object[discriminatorAsObject[polymorphicPropertyName]];
     }
     if (serializer.modelMappers && serializer.modelMappers.discriminators[indexDiscriminator]) {
       mapper = serializer.modelMappers.discriminators[indexDiscriminator];
@@ -687,20 +690,20 @@ function getPolymorphicMapperObjectVersion(serializer: Serializer, mapper: Compo
 // processes old version of the polymorphicDiscriminator in the mapper.
 function getPolymorphicMapperStringVersion(serializer: Serializer, mapper: CompositeMapper, object: any, objectName: string): CompositeMapper {
   // check for polymorphic discriminator
-  const discriminatorAsString: string = mapper.type.polymorphicDiscriminator as string;
-  if (discriminatorAsString !== null && discriminatorAsString !== undefined) {
-    if (object === null || object === undefined) {
+  const discriminatorAsString: string = mapper[K.type][K.polymorphicDiscriminator] as string;
+  if (discriminatorAsString != undefined) {
+    if (object == undefined) {
       throw new Error(`${objectName}" cannot be null or undefined. "${discriminatorAsString}" is the ` +
         `polmorphicDiscriminator and is a required property.`);
     }
-    if (object[discriminatorAsString] === null || object[discriminatorAsString] === undefined) {
+    if (object[discriminatorAsString] == undefined) {
       throw new Error(`No discriminator field "${discriminatorAsString}" was found in "${objectName}".`);
     }
     let indexDiscriminator = undefined;
-    if (object[discriminatorAsString] === mapper.type.uberParent) {
+    if (object[discriminatorAsString] === mapper[K.type][K.uberParent]) {
       indexDiscriminator = object[discriminatorAsString];
     } else {
-      indexDiscriminator = mapper.type.uberParent + "." + object[discriminatorAsString];
+      indexDiscriminator = mapper[K.type][K.uberParent] + "." + object[discriminatorAsString];
     }
     if (serializer.modelMappers && serializer.modelMappers.discriminators[indexDiscriminator]) {
       mapper = serializer.modelMappers.discriminators[indexDiscriminator];
@@ -725,64 +728,64 @@ export interface MapperConstraints {
 }
 
 export interface BaseMapperType {
-  name: string;
+  [K.name]: string;
   [key: string]: any;
 }
 
 export interface Mapper {
-  xmlName?: string;
-  xmlIsAttribute?: boolean;
-  xmlElementName?: string;
-  xmlIsWrapped?: boolean;
-  readOnly?: boolean;
-  isConstant?: boolean;
-  required?: boolean;
-  serializedName: string;
-  type: BaseMapperType;
-  defaultValue?: any;
-  constraints?: MapperConstraints;
+  [K.xmlName]?: string;
+  [K.xmlIsAttribute]?: boolean;
+  [K.xmlElementName]?: string;
+  [K.xmlIsWrapped]?: boolean;
+  [K.readOnly]?: boolean;
+  [K.isConstant]?: boolean;
+  [K.required]?: boolean;
+  [K.serializedName]: string;
+  [K.type]: BaseMapperType;
+  [K.defaultValue]?: any;
+  [K.constraints]?: MapperConstraints;
 }
 
 export interface PolymorphicDiscriminator {
-  serializedName: string;
-  clientName: string;
+  [K.serializedName]: string;
+  [K.clientName]: string;
   [key: string]: string;
 }
 
 export interface CompositeMapper extends Mapper {
-  type: {
-    name: "Composite";
-    className: string;
-    modelProperties?: { [propertyName: string]: Mapper };
-    uberParent?: string;
-    polymorphicDiscriminator?: string | PolymorphicDiscriminator;
+  [K.type]: {
+    [K.name]: "Composite";
+    [K.className]: string;
+    [K.modelProperties]?: { [propertyName: string]: Mapper };
+    [K.uberParent]?: string;
+    [K.polymorphicDiscriminator]?: string | PolymorphicDiscriminator;
   };
 }
 
 export interface SequenceMapper extends Mapper {
-  type: {
-    name: "Sequence";
-    element: Mapper;
+  [K.type]: {
+    [K.name]: "Sequence";
+    [K.element]: Mapper;
   };
 }
 
 export interface DictionaryMapper extends Mapper {
-  type: {
-    name: "Dictionary";
-    value: Mapper;
+  [K.type]: {
+    [K.name]: "Dictionary";
+    [K.value]: Mapper;
   };
 }
 
 export interface EnumMapper extends Mapper {
-  type: {
-    name: "Enum";
-    allowedValues: Array<any>;
+  [K.type]: {
+    [K.name]: "Enum";
+    [K.allowedValues]: Array<any>;
   };
 }
 
 export interface UrlParameterValue {
-  value: string;
-  skipUrlEncoding: boolean;
+  [K.value]: string;
+  [K.skipUrlEncoding]: boolean;
 }
 
 export function serializeObject(toSerialize: any): any {

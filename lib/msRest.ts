@@ -27,6 +27,7 @@ export {
   MapperConstraints, MapperType, PolymorphicDiscriminator,
   SequenceMapper, Serializer, UrlParameterValue, serializeObject
 } from "./serializer";
+export { MapperKey } from "./mapperKey";
 export {
   stripRequest, stripResponse, delay,
   executePromisesSequentially, generateUuid, encodeUri, ServiceCallback,
